@@ -1,0 +1,964 @@
+/* ═══ Visual Wow — Cinematic Crisis Effects ═══ */
+
+/* Mood ring theming */
+.nexus-shell.mood-green { --wow-accent: #33c17a; --wow-glow: rgba(51, 193, 122, 0.25); }
+.nexus-shell.mood-amber { --wow-accent: #f4a100; --wow-glow: rgba(244, 161, 0, 0.3); }
+.nexus-shell.mood-red { --wow-accent: #ff4655; --wow-glow: rgba(255, 70, 85, 0.35); }
+.nexus-shell.mood-glitch {
+  --wow-accent: #ff0044;
+  --wow-glow: rgba(255, 0, 68, 0.4);
+  animation: wow-glitch-bg 4s infinite;
+}
+
+@keyframes wow-glitch-bg {
+  0%, 90%, 100% { filter: none; }
+  92% { filter: hue-rotate(90deg) saturate(1.5); }
+  94% { filter: hue-rotate(-40deg); }
+}
+
+/* EKG header line */
+.wow-ekg-header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  width: 140px;
+  height: 24px;
+}
+.wow-ekg-header svg { width: 100px; height: 24px; flex: 1; }
+.wow-ekg-path {
+  stroke-dasharray: 400;
+  animation: wow-ekg-scroll calc(60s / var(--ekg-bpm, 72)) linear infinite;
+}
+@keyframes wow-ekg-scroll {
+  from { stroke-dashoffset: 400; }
+  to { stroke-dashoffset: 0; }
+}
+.wow-ekg-bpm { font-size: 10px; color: var(--ekg-color, var(--cyan)); font-family: Rajdhani, monospace; }
+
+/* Overlay root */
+.wow-overlay-root {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  z-index: 12;
+  overflow: hidden;
+}
+.wow-overlay-root > * { pointer-events: none; }
+.wow-overlay-root .wow-interactive,
+.wow-overlay-root .wow-soundscape,
+.wow-overlay-root .wow-dual-timeline,
+.wow-overlay-root .wow-tarot-overlay,
+.wow-overlay-root .wow-wrapped-overlay,
+.wow-overlay-root .wow-trophy-3d,
+.wow-overlay-root .wow-memorial-wall { pointer-events: auto; }
+.wow-overlay-root > .wow-particles-canvas,
+.wow-overlay-root > .wow-skybox,
+.wow-overlay-root > .wow-glass-cracks,
+.wow-overlay-root > .wow-constellation { pointer-events: none; }
+
+/* Day/night skybox */
+.wow-skybox {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    180deg,
+    rgba(5, 10, 30, calc(var(--night-opacity, 0) * 0.9)) 0%,
+    rgba(20, 30, 60, calc(var(--night-opacity, 0) * 0.5)) 40%,
+    transparent 70%
+  );
+  transition: opacity 1.2s ease;
+  z-index: 1;
+}
+.wow-overlay-root.is-night::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(circle at 20% 15%, rgba(255, 220, 120, 0.08) 0%, transparent 8%),
+    radial-gradient(circle at 75% 25%, rgba(255, 200, 80, 0.06) 0%, transparent 6%);
+  z-index: 2;
+  animation: wow-window-flicker 6s infinite;
+}
+@keyframes wow-window-flicker {
+  0%, 85%, 100% { opacity: 1; }
+  88% { opacity: 0.7; }
+  91% { opacity: 1; }
+  93% { opacity: 0.5; }
+}
+
+/* Tehran miniature mode */
+.wow-overlay-root.is-tehran-miniature,
+.map-container.is-tehran-miniature {
+  filter: saturate(1.3) sepia(0.15) brightness(1.05);
+}
+.map-container.is-tehran-miniature .map-hud-title {
+  font-family: "Vazirmatn", Tahoma, serif;
+  letter-spacing: 0.05em;
+}
+.map-container.is-tehran-miniature::before {
+  content: "";
+  position: absolute;
+  inset: 8px;
+  border: 2px solid rgba(244, 161, 0, 0.4);
+  border-radius: 4px;
+  pointer-events: none;
+  z-index: 20;
+  box-shadow: inset 0 0 30px rgba(244, 161, 0, 0.08);
+}
+
+/* Ghost city */
+.wow-overlay-root.is-ghost-city ~ .deck-map-root,
+.deck-map-root.is-ghost-city {
+  opacity: 0.35;
+  filter: grayscale(0.7) brightness(0.6);
+}
+
+/* Photo / cinematic mode */
+.wow-overlay-root.is-photo-mode::before,
+.wow-overlay-root.is-photo-mode::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  right: 0;
+  height: 8%;
+  background: #000;
+  z-index: 50;
+}
+.wow-overlay-root.is-photo-mode::before { top: 0; }
+.wow-overlay-root.is-photo-mode::after { bottom: 0; }
+.wow-photo-watermark {
+  position: absolute;
+  bottom: 10%;
+  right: 16px;
+  font-size: 10px;
+  letter-spacing: 0.3em;
+  color: rgba(255, 255, 255, 0.5);
+  z-index: 55;
+  text-shadow: 0 0 8px rgba(76, 201, 240, 0.5);
+}
+
+/* VHS rewind */
+.wow-overlay-root.is-vhs-rewind {
+  animation: wow-vhs 1.4s ease-out;
+}
+@keyframes wow-vhs {
+  0% { filter: brightness(2) contrast(1.5); transform: scaleY(0.02); }
+  30% { filter: brightness(0.5) hue-rotate(180deg); transform: scaleY(1.1); }
+  60% { filter: none; transform: scaleY(0.95); }
+  100% { filter: none; transform: none; }
+}
+
+/* Broken glass */
+.wow-glass-cracks {
+  position: absolute;
+  inset: 0;
+  z-index: 45;
+  background:
+    linear-gradient(135deg, transparent 48%, rgba(255,255,255,0.06) 49%, transparent 50%),
+    linear-gradient(45deg, transparent 62%, rgba(255,255,255,0.04) 63%, transparent 64%);
+  animation: wow-glass-shake 0.4s ease;
+}
+@keyframes wow-glass-shake {
+  0%, 100% { transform: translate(0); }
+  25% { transform: translate(-2px, 1px); }
+  75% { transform: translate(2px, -1px); }
+}
+
+/* Particles canvas */
+.wow-particles-canvas {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 3;
+}
+
+/* Holographic HUD */
+.wow-hud-panel {
+  position: absolute;
+  padding: 10px 14px;
+  background: rgba(10, 20, 35, 0.55);
+  border: 1px solid rgba(76, 201, 240, 0.25);
+  border-radius: 6px;
+  backdrop-filter: blur(12px);
+  overflow: hidden;
+  min-width: 120px;
+  z-index: 15;
+}
+.wow-hud-tl { top: 60px; left: 12px; }
+.wow-hud-br { bottom: 80px; right: 12px; }
+.wow-hud-scanline {
+  position: absolute;
+  inset: 0;
+  background: repeating-linear-gradient(0deg, transparent, transparent 2px, rgba(76, 201, 240, 0.03) 2px, rgba(76, 201, 240, 0.03) 4px);
+  animation: wow-scan 3s linear infinite;
+  pointer-events: none;
+}
+@keyframes wow-scan {
+  from { transform: translateY(-100%); }
+  to { transform: translateY(100%); }
+}
+.wow-hud-label {
+  font-size: 8px;
+  letter-spacing: 0.15em;
+  color: var(--cyan);
+  text-transform: uppercase;
+  margin-bottom: 4px;
+}
+.wow-hud-stat { font-size: 10px; color: var(--text); line-height: 1.6; }
+
+/* Infrastructure rings */
+.wow-infra-rings {
+  position: absolute;
+  bottom: 12px;
+  left: 12px;
+  display: flex;
+  gap: 6px;
+  z-index: 16;
+  pointer-events: none;
+}
+.wow-infra-ring {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+}
+.wow-infra-ring svg { width: 32px; height: 32px; }
+.wow-infra-ring span { font-size: 7px; color: var(--muted); letter-spacing: 0.1em; }
+
+/* Neural net */
+.wow-neural-net {
+  position: absolute;
+  top: 60px;
+  right: 12px;
+  width: 140px;
+  padding: 8px;
+  background: rgba(0, 0, 0, 0.6);
+  border: 1px solid rgba(76, 201, 240, 0.2);
+  border-radius: 6px;
+  z-index: 14;
+}
+.wow-neural-net svg { width: 100%; height: 50px; }
+
+/* Crisis DNA */
+.wow-crisis-dna {
+  position: absolute;
+  top: 100px;
+  left: 12px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 10px;
+  background: rgba(0, 0, 0, 0.65);
+  border: 1px solid hsl(var(--dna-hue, 200), 60%, 50%, 0.4);
+  border-radius: 6px;
+  z-index: 13;
+}
+.wow-dna-pattern {
+  width: 28px;
+  height: 28px;
+  border-radius: 4px;
+  background: hsl(var(--dna-hue, 200), 70%, 45%);
+  opacity: 0.8;
+}
+.wow-dna-pattern.pat-1 { clip-path: polygon(50% 0%, 100% 50%, 50% 100%, 0% 50%); }
+.wow-dna-pattern.pat-2 { border-radius: 50%; }
+.wow-dna-pattern.pat-3 { clip-path: polygon(50% 0%, 100% 100%, 0% 100%); }
+.wow-dna-label { display: flex; flex-direction: column; gap: 1px; }
+.wow-dna-label span { font-size: 7px; letter-spacing: 0.12em; color: var(--cyan); }
+.wow-dna-label code { font-size: 8px; color: var(--muted); }
+.wow-dna-label small { font-size: 8px; color: var(--amber); text-transform: capitalize; }
+
+/* Constellation */
+.wow-constellation {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 25%;
+  z-index: 4;
+  opacity: 0.7;
+}
+.wow-constellation svg { width: 100%; height: 100%; }
+
+/* Soundscape */
+.wow-soundscape {
+  position: absolute;
+  bottom: 60px;
+  right: 12px;
+  width: 160px;
+  padding: 10px;
+  background: rgba(0, 0, 0, 0.75);
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  z-index: 18;
+}
+.wow-sound-channel {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 9px;
+  margin-top: 4px;
+}
+.wow-sound-channel span { width: 52px; color: var(--muted); }
+.wow-sound-channel input { flex: 1; }
+
+/* Dual timeline */
+.wow-dual-timeline {
+  position: absolute;
+  bottom: 12px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: min(420px, 90%);
+  padding: 10px 14px;
+  background: rgba(0, 0, 0, 0.8);
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  z-index: 19;
+}
+.wow-dual-timeline label {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 9px;
+  margin-bottom: 6px;
+}
+.wow-dual-timeline label span:first-child { width: 70px; color: var(--cyan); }
+.wow-dual-timeline input { flex: 1; }
+
+/* Memorial wall */
+.wow-memorial-wall {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  padding: 20px 28px;
+  background: linear-gradient(180deg, rgba(30, 25, 20, 0.95), rgba(15, 12, 10, 0.98));
+  border: 1px solid rgba(244, 161, 0, 0.3);
+  border-radius: 4px;
+  z-index: 30;
+  text-align: center;
+}
+.wow-memorial-title {
+  font-size: 14px;
+  letter-spacing: 0.2em;
+  color: var(--amber);
+  margin-bottom: 12px;
+}
+.wow-memorial-plaques { display: flex; gap: 10px; flex-wrap: wrap; justify-content: center; }
+.wow-memorial-plaque {
+  padding: 8px 14px;
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  font-size: 10px;
+  color: var(--muted);
+}
+
+/* Trophy 3D */
+.wow-trophy-3d {
+  position: absolute;
+  bottom: 100px;
+  right: 20px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  cursor: pointer;
+  z-index: 25;
+  animation: wow-trophy-float 3s ease-in-out infinite;
+}
+.wow-trophy-cup {
+  font-size: 36px;
+  filter: drop-shadow(0 4px 12px rgba(244, 161, 0, 0.6));
+  transform: perspective(200px) rotateX(-10deg);
+}
+.wow-trophy-glow {
+  width: 40px;
+  height: 8px;
+  background: radial-gradient(ellipse, rgba(244, 161, 0, 0.5), transparent);
+  margin-top: -4px;
+}
+.wow-trophy-3d span { font-size: 8px; letter-spacing: 0.15em; color: var(--amber); margin-top: 4px; }
+@keyframes wow-trophy-float {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-8px); }
+}
+
+/* Wax seal */
+.wow-wax-seal {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%) scale(0);
+  z-index: 40;
+  animation: wow-seal-stamp 3.2s ease forwards;
+}
+.wow-seal-inner {
+  width: 140px;
+  height: 140px;
+  border-radius: 50%;
+  background: radial-gradient(circle at 35% 35%, #c0392b, #8b0000);
+  border: 4px solid #6b1010;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5), inset 0 2px 8px rgba(255, 255, 255, 0.15);
+}
+.wow-seal-text { font-size: 14px; font-weight: bold; color: rgba(255, 220, 180, 0.9); letter-spacing: 0.1em; }
+.wow-seal-decision { font-size: 8px; color: rgba(255, 200, 150, 0.7); text-align: center; padding: 4px 12px; margin-top: 4px; }
+@keyframes wow-seal-stamp {
+  0% { transform: translate(-50%, -50%) scale(2) rotate(-20deg); opacity: 0; }
+  15% { transform: translate(-50%, -50%) scale(1) rotate(0deg); opacity: 1; }
+  80% { opacity: 1; }
+  100% { transform: translate(-50%, -50%) scale(0.9); opacity: 0; }
+}
+
+/* Tarot card */
+.wow-tarot-overlay {
+  position: absolute;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.7);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 50;
+  cursor: pointer;
+}
+.wow-tarot-card {
+  width: 200px;
+  height: 280px;
+  perspective: 800px;
+  animation: wow-tarot-flip 0.8s ease forwards;
+}
+.wow-tarot-front {
+  width: 100%;
+  height: 100%;
+  padding: 20px;
+  background: linear-gradient(145deg, #1a1530, #2a2040);
+  border: 2px solid rgba(244, 161, 0, 0.5);
+  border-radius: 12px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.6);
+}
+.wow-tarot-emoji { font-size: 48px; margin-bottom: 12px; }
+.wow-tarot-front h3 { font-size: 14px; color: var(--amber); margin: 0 0 8px; }
+.wow-tarot-front p { font-size: 10px; color: var(--muted); line-height: 1.5; flex: 1; }
+.wow-tarot-card.sev-critical .wow-tarot-front { border-color: var(--red); }
+@keyframes wow-tarot-flip {
+  from { transform: rotateY(90deg); opacity: 0; }
+  to { transform: rotateY(0deg); opacity: 1; }
+}
+
+/* Toolbar */
+.wow-toolbar {
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  display: flex;
+  gap: 4px;
+  z-index: 22;
+}
+.wow-toolbar-btn {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  padding: 4px 8px;
+  font-size: 9px;
+  background: rgba(0, 0, 0, 0.7);
+  border: 1px solid var(--line);
+  border-radius: 4px;
+  color: var(--text);
+  cursor: pointer;
+  backdrop-filter: blur(8px);
+}
+.wow-toolbar-btn:hover,
+.wow-toolbar-btn.active { border-color: var(--cyan); color: var(--cyan); }
+
+/* Panel */
+.wow-panel { padding: 4px 0; }
+.wow-panel.is-expanded { max-height: 70vh; overflow-y: auto; }
+.wow-panel-header h3 { margin: 0 0 4px; font-size: 14px; color: var(--cyan); }
+.wow-feature-group { margin-top: 16px; }
+.wow-feature-grid { display: flex; flex-direction: column; gap: 6px; }
+.wow-feature-toggle {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  padding: 8px 10px;
+  border: 1px solid var(--line);
+  border-radius: 6px;
+  cursor: pointer;
+  transition: border-color 0.2s, background 0.2s;
+}
+.wow-feature-toggle.is-on { border-color: var(--cyan); background: rgba(76, 201, 240, 0.06); }
+.wow-feature-toggle input { margin-top: 2px; }
+.wow-feature-info { display: flex; flex-direction: column; gap: 2px; }
+.wow-feature-info strong { font-size: 11px; }
+.wow-feature-info .hint { font-size: 9px; line-height: 1.4; }
+.wow-panel-actions { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 16px; }
+.wow-fingerprint-preview {
+  margin-top: 12px;
+  padding: 8px;
+  background: rgba(0, 0, 0, 0.3);
+  border-radius: 4px;
+  font-size: 9px;
+}
+.wow-fingerprint-preview code { display: block; margin-top: 4px; color: var(--cyan); word-break: break-all; }
+
+/* DC vs Tehran night palettes */
+.wow-overlay-root.is-night.city-dc .wow-skybox {
+  background: linear-gradient(180deg, rgba(5, 15, 40, 0.85) 0%, rgba(10, 25, 55, 0.4) 50%, transparent 80%);
+}
+.wow-overlay-root.is-night.city-teh .wow-skybox {
+  background: linear-gradient(180deg, rgba(30, 10, 25, 0.8) 0%, rgba(60, 25, 15, 0.35) 50%, transparent 80%);
+}
+
+/* Chromatic aberration on critical mood */
+.wow-chromatic-glitch {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 9998;
+  mix-blend-mode: screen;
+  animation: wowChromatic 0.15s steps(2) infinite;
+  background:
+    linear-gradient(90deg, rgba(255, 0, 68, 0.08) 0%, transparent 33%),
+    linear-gradient(90deg, transparent 33%, rgba(0, 255, 200, 0.08) 66%, transparent 100%);
+}
+
+@keyframes wowChromatic {
+  0% { transform: translate(-2px, 0); }
+  50% { transform: translate(2px, 1px); }
+  100% { transform: translate(-1px, -1px); }
+}
+
+/* Horizontal scan beam */
+.wow-scan-beam {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, rgba(76, 201, 240, 0.6), transparent);
+  box-shadow: 0 0 30px rgba(76, 201, 240, 0.4);
+  pointer-events: none;
+  z-index: 9997;
+  animation: wowScanBeam 6s ease-in-out infinite;
+}
+
+@keyframes wowScanBeam {
+  0% { top: 0; opacity: 0; }
+  5% { opacity: 1; }
+  95% { opacity: 1; }
+  100% { top: 100vh; opacity: 0; }
+}
+
+/* Command page: stack bottom overlays above feature hub */
+.nx-shell-command .wow-soundscape {
+  bottom: calc(var(--cmd-hub-offset, 36px) + 12px);
+  inset-inline-end: 8px;
+  width: 148px;
+  padding: 8px;
+}
+
+.nx-shell-command .wow-dual-timeline {
+  bottom: calc(var(--cmd-hub-offset, 36px) + 12px);
+  width: min(300px, calc(100% - 340px));
+  padding: 8px 10px;
+}
+
+.nx-shell-command .wow-infra-rings {
+  bottom: calc(var(--cmd-hub-offset, 36px) + 12px);
+  inset-inline-start: 8px;
+}
+
+.nx-shell-command .wow-hud-br {
+  bottom: calc(var(--cmd-hub-offset, 36px) + 168px);
+  inset-inline-end: 8px;
+}
+
+.nx-shell-command .wow-hud-tl {
+  top: auto;
+  bottom: calc(var(--cmd-hub-offset, 36px) + 72px);
+  inset-inline-start: 8px;
+  min-width: 100px;
+  padding: 6px 10px;
+}
+
+.nx-shell-command .wow-crisis-dna {
+  top: auto;
+  bottom: calc(var(--cmd-hub-offset, 36px) + 72px);
+  inset-inline-start: 120px;
+}
+
+.nx-shell-command .wow-neural-net {
+  display: none;
+}
+
+/* ═══ Visual Wow v2 ═══ */
+
+/* EBS Emergency Broadcast */
+.wow-ebs-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 99999;
+  background: #000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  animation: wowEbsIn 0.4s ease forwards;
+  pointer-events: none;
+}
+.wow-ebs-bars {
+  position: absolute;
+  inset: 0;
+  background: repeating-linear-gradient(
+    0deg,
+    #000 0px,
+    #000 40px,
+    #fff 40px,
+    #fff 80px
+  );
+  opacity: 0.08;
+  animation: wowEbsBars 0.5s steps(4) infinite;
+}
+.wow-ebs-content {
+  position: relative;
+  text-align: center;
+  padding: 40px;
+  max-width: 90%;
+}
+.wow-ebs-badge {
+  font-size: 14px;
+  letter-spacing: 0.35em;
+  color: #fff;
+  background: #c0392b;
+  padding: 8px 24px;
+  display: inline-block;
+  margin-bottom: 24px;
+  animation: wowEbsPulse 1s ease infinite;
+}
+.wow-ebs-message {
+  font-size: clamp(24px, 5vw, 48px);
+  font-weight: bold;
+  color: #fff;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  text-shadow: 0 0 20px rgba(255, 70, 85, 0.8);
+  animation: wowEbsText 0.3s steps(2) infinite;
+}
+.wow-ebs-scan {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(180deg, transparent, rgba(255,255,255,0.04), transparent);
+  animation: wowScanBeam 2s linear infinite;
+}
+@keyframes wowEbsIn {
+  from { opacity: 0; transform: scale(1.05); }
+  to { opacity: 1; transform: none; }
+}
+@keyframes wowEbsBars {
+  0%, 100% { opacity: 0.06; }
+  50% { opacity: 0.12; }
+}
+@keyframes wowEbsPulse {
+  0%, 100% { background: #c0392b; }
+  50% { background: #e74c3c; }
+}
+@keyframes wowEbsText {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.85; }
+}
+
+/* Before / After recovery slider */
+.wow-before-after {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 6px 10px;
+  background: rgba(0, 0, 0, 0.85);
+  border: 1px solid var(--line);
+  border-radius: 8px;
+}
+.wow-overlay-root:not(.is-compact) .wow-before-after {
+  position: absolute;
+  top: 50px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 21;
+}
+.wow-ba-label {
+  font-size: 9px;
+  letter-spacing: 0.1em;
+  color: var(--muted);
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+.wow-before-after input { width: 140px; }
+
+/* Before/after map filter blend */
+.deck-map-root[style*="--recovery-blend"] .deckgl-overlay,
+.deck-map-root[style*="--recovery-blend"] canvas {
+  filter: grayscale(calc(var(--crisis-filter, 0) * 0.7))
+    sepia(calc(var(--crisis-filter, 0) * 0.3))
+    brightness(calc(0.65 + var(--recovery-blend, 1) * 0.35))
+    saturate(calc(0.5 + var(--recovery-blend, 1) * 0.5));
+  transition: filter 0.3s ease;
+}
+
+/* Fog of war vignette */
+.deck-map-root.has-fog-of-war::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  z-index: 8;
+  background: radial-gradient(ellipse at center, transparent 30%, rgba(0, 0, 0, 0.55) 100%);
+}
+.wow-fog-vignette {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  z-index: 7;
+  background: repeating-linear-gradient(
+    45deg,
+    transparent,
+    transparent 80px,
+    rgba(0, 0, 0, 0.03) 80px,
+    rgba(0, 0, 0, 0.03) 81px
+  );
+  mix-blend-mode: multiply;
+}
+
+/* Map annotation mode */
+.deck-map-root.is-annotating {
+  cursor: crosshair !important;
+}
+.wow-annotation-toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+  align-items: center;
+}
+.wow-overlay-root:not(.is-compact) .wow-annotation-toolbar {
+  position: absolute;
+  bottom: 48px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 23;
+}
+.wow-annotation-role {
+  font-size: 9px;
+  padding: 4px 6px;
+  background: rgba(0, 0, 0, 0.8);
+  border: 1px solid var(--line);
+  border-radius: 4px;
+  color: var(--text);
+}
+
+/* Crisis Wrapped card */
+.wow-wrapped-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.85);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 99990;
+  cursor: pointer;
+}
+.wow-wrapped-card {
+  width: min(380px, 92vw);
+  padding: 28px 24px;
+  background: linear-gradient(145deg, #1a1030, #0d0820 60%, #1a2040);
+  border: 1px solid rgba(244, 161, 0, 0.4);
+  border-radius: 16px;
+  text-align: center;
+  cursor: default;
+  animation: wowWrappedIn 0.5s ease;
+  box-shadow: 0 24px 80px rgba(0, 0, 0, 0.6);
+}
+.wow-wrapped-grade {
+  font-size: 56px;
+  font-weight: bold;
+  color: var(--amber);
+  text-shadow: 0 0 30px rgba(244, 161, 0, 0.6);
+  line-height: 1;
+  margin-bottom: 8px;
+}
+.wow-wrapped-card h2 {
+  margin: 0 0 4px;
+  font-size: 18px;
+  color: #fff;
+}
+.wow-wrapped-sub {
+  font-size: 10px;
+  color: var(--muted);
+  margin: 0 0 20px;
+  letter-spacing: 0.1em;
+}
+.wow-wrapped-stats {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 10px;
+  margin-bottom: 20px;
+}
+.wow-wrapped-stat {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  padding: 10px 6px;
+  background: rgba(255, 255, 255, 0.04);
+  border-radius: 8px;
+}
+.wow-wrapped-stat span { font-size: 20px; }
+.wow-wrapped-stat strong { font-size: 14px; color: var(--cyan); }
+.wow-wrapped-stat small { font-size: 8px; color: var(--muted); }
+.wow-wrapped-actions {
+  display: flex;
+  gap: 8px;
+  justify-content: center;
+}
+@keyframes wowWrappedIn {
+  from { transform: scale(0.85) rotate(-2deg); opacity: 0; }
+  to { transform: none; opacity: 1; }
+}
+
+.cmd-warroom-annotation {
+  margin-top: 12px;
+  padding-top: 12px;
+  border-top: 1px solid var(--line);
+}
+
+.nx-shell-command .wow-before-after {
+  top: auto;
+  bottom: auto;
+  position: static;
+  transform: none;
+}
+
+.nx-shell-command .wow-annotation-toolbar {
+  bottom: auto;
+  position: static;
+  transform: none;
+}
+
+/* Compact command layout — single dock, minimal HUD */
+.wow-overlay-root.is-compact .wow-hud-panel { display: none; }
+
+.wow-compact-hud {
+  position: absolute;
+  top: calc(var(--cmd-ticker-h, 32px) + 36px);
+  inset-inline-start: 8px;
+  display: flex;
+  gap: 8px;
+  padding: 4px 8px;
+  background: rgba(0, 0, 0, 0.75);
+  border: 1px solid rgba(76, 201, 240, 0.25);
+  border-radius: 6px;
+  font-size: 8px;
+  letter-spacing: 0.06em;
+  color: var(--muted);
+  z-index: 14;
+}
+.wow-compact-hud span { color: var(--cyan); }
+
+.wow-map-dock {
+  position: absolute;
+  bottom: calc(var(--cmd-hub-offset, 36px) + 8px);
+  inset-inline-start: 8px;
+  inset-inline-end: 72px;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px;
+  z-index: 20;
+  max-width: calc(100% - 16px);
+}
+
+.wow-overlay-root.is-compact .wow-infra-rings,
+.wow-overlay-root.is-compact .wow-crisis-dna,
+.wow-overlay-root.is-compact .wow-dual-timeline,
+.wow-overlay-root.is-compact .wow-soundscape,
+.wow-overlay-root.is-compact .wow-neural-net,
+.wow-overlay-root.is-compact .wow-constellation {
+  display: none !important;
+}
+
+.nx-shell-command .wow-map-dock {
+  inset-inline-end: 8px;
+}
+
+.nx-shell-command:has(.cmd-feature-hub.is-open) .wow-map-dock {
+  bottom: calc(var(--cmd-hub-offset, 236px) + 8px);
+}
+
+/* Guided demo overlay */
+.demo-guide-overlay {
+  position: fixed;
+  top: calc(var(--cmd-ticker-h, 32px) + 12px);
+  inset-inline-end: 12px;
+  z-index: 99980;
+  pointer-events: none;
+  max-width: min(320px, 90vw);
+}
+.demo-guide-card {
+  pointer-events: auto;
+  padding: 12px 14px;
+  background: rgba(6, 10, 18, 0.94);
+  border: 1px solid rgba(51, 193, 122, 0.45);
+  border-radius: 10px;
+  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.45);
+  animation: wowWrappedIn 0.4s ease;
+}
+.demo-guide-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 8px;
+}
+.demo-guide-badge {
+  font-size: 8px;
+  letter-spacing: 0.15em;
+  color: #33c17a;
+  font-weight: 700;
+}
+.demo-guide-step {
+  font-size: 9px;
+  color: var(--muted);
+  font-family: Rajdhani, monospace;
+}
+.demo-guide-text {
+  margin: 0 0 10px;
+  font-size: 11px;
+  line-height: 1.45;
+  color: var(--text);
+}
+.demo-guide-bar {
+  height: 3px;
+  background: rgba(255, 255, 255, 0.08);
+  border-radius: 999px;
+  overflow: hidden;
+  margin-bottom: 8px;
+}
+.demo-guide-bar span {
+  display: block;
+  height: 100%;
+  background: linear-gradient(90deg, #33c17a, #4cc9f0);
+  transition: width 0.4s ease;
+}
+.demo-guide-card.is-voice {
+  border-color: rgba(76, 201, 240, 0.55);
+  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.45), 0 0 24px rgba(76, 201, 240, 0.18);
+}
+.demo-guide-card.is-voice .demo-guide-badge {
+  color: #4cc9f0;
+}
+.demo-guide-card.is-voice .demo-guide-bar span {
+  background: linear-gradient(90deg, #4cc9f0, #f72585);
+}
+
+.nx-shell-command .adv-map-overlay {
+  max-width: min(240px, 40%);
+}

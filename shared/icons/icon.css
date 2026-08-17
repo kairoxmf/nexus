@@ -1,0 +1,74 @@
+.icon-3d {
+  line-height: 0;
+}
+
+.icon-3d svg {
+  display: block;
+}
+
+.icon-3d-inline {
+  display: inline-flex;
+  vertical-align: -0.15em;
+  margin-inline-end: 4px;
+}
+
+.icon-3d-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.icon-3d.is-animated.icon-3d--loading svg {
+  animation: icon-spin 0.9s linear infinite;
+}
+
+.icon-3d.is-animated.icon-3d--heart svg,
+.icon-3d.is-animated.icon-3d--dot svg {
+  animation: icon-pulse 1.2s ease-in-out infinite;
+}
+
+.icon-3d.is-animated.icon-3d--bell svg {
+  animation: icon-swing 1.4s ease-in-out infinite;
+}
+
+.icon-3d.is-animated.icon-3d--warning svg {
+  animation: icon-pulse 1.6s ease-in-out infinite;
+}
+
+.icon-3d.is-animated.icon-3d--mic svg,
+.icon-3d.is-animated.icon-3d--volume-on svg,
+.icon-3d.is-animated.icon-3d--refresh svg,
+.icon-3d.is-animated.icon-3d--music svg {
+  animation: icon-glow 1.5s ease-in-out infinite;
+}
+
+.icon-3d.is-animated.icon-3d--send svg,
+.icon-3d.is-animated.icon-3d--arrow-up svg {
+  animation: icon-bob 1.4s ease-in-out infinite;
+}
+
+@keyframes icon-spin {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+@keyframes icon-pulse {
+  0%, 100% { transform: scale(1); opacity: 1; }
+  50% { transform: scale(1.12); opacity: 0.85; }
+}
+
+@keyframes icon-swing {
+  0%, 100% { transform: rotate(0deg); }
+  25% { transform: rotate(8deg); }
+  75% { transform: rotate(-8deg); }
+}
+
+@keyframes icon-glow {
+  0%, 100% { opacity: 1; filter: drop-shadow(0 0 0 transparent); }
+  50% { opacity: 0.85; filter: drop-shadow(0 0 4px currentColor); }
+}
+
+@keyframes icon-bob {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-2px); }
+}

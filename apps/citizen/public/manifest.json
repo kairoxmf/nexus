@@ -1,0 +1,17 @@
+{
+  "name": "NEXUS Citizen",
+  "short_name": "NEXUS",
+  "description": "Crisis safety, SOS, AR evacuation, and push alerts for Washington D.C.",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#0a0e14",
+  "theme_color": "#4cc9f0",
+  "icons": [
+    {
+      "src": "/icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ]
+}

@@ -1,0 +1,689 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>NEXUS — City Recovery Command</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#0A0E14;
+    --panel:#0F151F;
+    --panel-2:#131A26;
+    --line:#1C2532;
+    --line-soft:#161D28;
+    --cyan:#4CC9F0;
+    --amber:#F4A100;
+    --red:#FF4655;
+    --green:#33C17A;
+    --text:#E8EDF2;
+    --muted:#6B7688;
+    --muted-2:#4A5361;
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;background:var(--bg);color:var(--text);font-family:'IBM Plex Mono',monospace;overflow-x:hidden;}
+  .app{display:flex;flex-direction:column;min-height:100vh;background:
+    radial-gradient(ellipse at 20% -10%, rgba(76,201,240,0.06), transparent 50%),
+    radial-gradient(ellipse at 90% 110%, rgba(244,161,0,0.05), transparent 50%),
+    var(--bg);}
+  h1,h2,h3{font-family:'Rajdhani',sans-serif;margin:0;letter-spacing:0.02em;}
+
+  /* HEADER */
+  header{display:flex;align-items:center;justify-content:space-between;padding:14px 24px;border-bottom:1px solid var(--line);background:var(--panel);}
+  .brand{display:flex;align-items:center;gap:12px;}
+  .brand .mark{width:34px;height:34px;border:1.5px solid var(--cyan);border-radius:3px;display:flex;align-items:center;justify-content:center;position:relative;}
+  .brand .mark::before{content:'';position:absolute;width:14px;height:14px;border:1.5px solid var(--cyan);border-radius:50%;animation:pulse-ring 2.4s ease-out infinite;}
+  .brand .mark::after{content:'';width:5px;height:5px;background:var(--cyan);border-radius:50%;}
+  @keyframes pulse-ring{0%{transform:scale(0.4);opacity:1;}100%{transform:scale(1.8);opacity:0;}}
+  .brand-text h1{font-size:20px;font-weight:700;color:var(--text);}
+  .brand-text .sub{font-size:10px;color:var(--muted);letter-spacing:0.15em;text-transform:uppercase;}
+  .header-right{display:flex;align-items:center;gap:28px;}
+  .clock-block{text-align:right;}
+  .clock-block .label{font-size:9px;color:var(--muted);text-transform:uppercase;letter-spacing:0.1em;}
+  .clock-block .val{font-family:'Rajdhani',sans-serif;font-size:18px;font-weight:600;color:var(--cyan);}
+  .health-badge{display:flex;align-items:center;gap:10px;padding:6px 14px;border:1px solid var(--line);border-radius:4px;background:var(--panel-2);}
+  .health-badge .ring{width:28px;height:28px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:9px;font-weight:600;}
+
+  /* DASHBOARD STRIP */
+  .dash{display:grid;grid-template-columns:repeat(7,1fr);gap:1px;background:var(--line);border-bottom:1px solid var(--line);}
+  .dash-cell{background:var(--panel);padding:10px 14px;}
+  .dash-cell .label{font-size:9px;color:var(--muted);text-transform:uppercase;letter-spacing:0.08em;margin-bottom:6px;}
+  .dash-cell .bar-track{height:4px;background:var(--line-soft);border-radius:2px;overflow:hidden;margin-bottom:5px;}
+  .dash-cell .bar-fill{height:100%;border-radius:2px;transition:width 0.5s ease, background 0.5s ease;}
+  .dash-cell .num{font-family:'Rajdhani',sans-serif;font-size:16px;font-weight:600;}
+
+  /* MAIN LAYOUT */
+  .main{display:grid;grid-template-columns:260px 1fr 300px;flex:1;min-height:0;}
+  .panel{background:var(--panel);border-right:1px solid var(--line);padding:16px;overflow-y:auto;}
+  .panel:last-child{border-right:none;border-left:1px solid var(--line);}
+  .section{margin-bottom:22px;}
+  .section-title{font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:0.12em;margin-bottom:10px;display:flex;align-items:center;gap:6px;}
+  .section-title::before{content:'';width:3px;height:11px;background:var(--cyan);display:inline-block;}
+
+  label.field{display:block;font-size:10px;color:var(--muted-2);text-transform:uppercase;letter-spacing:0.06em;margin-bottom:5px;margin-top:12px;}
+  select, input[type=range]{width:100%;}
+  select{background:var(--panel-2);border:1px solid var(--line);color:var(--text);padding:7px 8px;border-radius:3px;font-family:'IBM Plex Mono',monospace;font-size:12px;}
+  input[type=range]{accent-color:var(--cyan);}
+  .range-val{float:right;color:var(--amber);font-size:11px;}
+
+  button{font-family:'Rajdhani',sans-serif;font-weight:600;letter-spacing:0.03em;cursor:pointer;border-radius:3px;transition:all .15s ease;}
+  .btn-primary{width:100%;padding:11px;background:var(--cyan);color:#04141c;border:none;font-size:13px;margin-top:14px;}
+  .btn-primary:hover{background:#6fd6f7;}
+  .btn-primary:disabled{background:var(--line);color:var(--muted);cursor:not-allowed;}
+  .btn-ghost{width:100%;padding:9px;background:transparent;border:1px solid var(--line);color:var(--text);font-size:12px;margin-bottom:8px;text-align:left;padding-left:12px;}
+  .btn-ghost:hover{border-color:var(--cyan);color:var(--cyan);}
+  .btn-danger:hover{border-color:var(--red);color:var(--red);}
+  .btn-recover{width:100%;padding:13px;margin-top:6px;background:var(--amber);color:#241800;border:none;font-size:14px;letter-spacing:0.06em;}
+  .btn-recover:hover{background:#ffbb2e;}
+  .btn-recover.active{background:var(--green);color:#062012;}
+  .hint{font-size:10px;color:var(--muted);line-height:1.5;margin-top:8px;}
+  .armed-note{font-size:10px;color:var(--amber);margin-top:8px;border-left:2px solid var(--amber);padding-left:8px;line-height:1.5;}
+
+  /* MAP */
+  .map-wrap{position:relative;display:flex;align-items:center;justify-content:center;background:
+    linear-gradient(var(--line-soft) 1px, transparent 1px), linear-gradient(90deg, var(--line-soft) 1px, transparent 1px);
+    background-size:32px 32px; background-color:#0B1017;}
+  svg{width:100%;height:100%;display:block;cursor:crosshair;}
+  .legend{position:absolute;bottom:12px;left:12px;background:rgba(15,21,31,0.9);border:1px solid var(--line);border-radius:4px;padding:8px 12px;font-size:10px;display:flex;gap:14px;}
+  .legend-item{display:flex;align-items:center;gap:5px;color:var(--muted);}
+  .legend-dot{width:8px;height:8px;border-radius:50%;}
+  .tick-counter{position:absolute;top:12px;right:12px;background:rgba(15,21,31,0.9);border:1px solid var(--line);border-radius:4px;padding:6px 10px;font-size:10px;color:var(--muted);}
+  .tick-counter b{color:var(--cyan);}
+
+  /* LOG */
+  .log-list{display:flex;flex-direction:column;gap:7px;}
+  .log-entry{font-size:11px;line-height:1.5;padding:8px 10px;border-radius:3px;background:var(--panel-2);border-left:2px solid var(--line);animation:slidein .3s ease;}
+  .log-entry.info{border-left-color:var(--cyan);}
+  .log-entry.warning{border-left-color:var(--amber);}
+  .log-entry.critical{border-left-color:var(--red);}
+  .log-entry.success{border-left-color:var(--green);}
+  .log-entry .agent{color:var(--amber);font-weight:600;}
+  .log-entry .t{color:var(--muted-2);font-size:9px;margin-right:6px;}
+  @keyframes slidein{from{opacity:0;transform:translateY(-4px);}to{opacity:1;transform:translateY(0);}}
+
+  .agent-strip{display:flex;flex-wrap:wrap;gap:6px;margin-top:10px;}
+  .agent-chip{font-size:9px;padding:4px 8px;border-radius:10px;border:1px solid var(--line);color:var(--muted);text-transform:uppercase;letter-spacing:0.05em;}
+  .agent-chip.active{border-color:var(--cyan);color:var(--cyan);}
+
+  ::-webkit-scrollbar{width:6px;}
+  ::-webkit-scrollbar-thumb{background:var(--line);border-radius:3px;}
+</style>
+</head>
+<body>
+<div class="app" id="app"></div>
+
+<script>
+/* ============ CITY DATA ============ */
+const NODE_DEFS = [
+  {id:'power1', type:'power', name:'Riverside Power Plant', x:110, y:90, priority:5, deps:[]},
+  {id:'water1', type:'water', name:'North Water Station', x:610, y:70, priority:5, deps:['power1']},
+  {id:'hosp1', type:'hospital', name:'St. Mary Hospital', x:290, y:190, priority:5, deps:['power1','water1']},
+  {id:'hosp2', type:'hospital', name:'Eastside Medical Ctr', x:540, y:290, priority:5, deps:['power1']},
+  {id:'fire1', type:'fire', name:'Fire Station 3', x:190, y:300, priority:4, deps:['water1']},
+  {id:'police1', type:'police', name:'Central Police HQ', x:400, y:110, priority:3, deps:['power1']},
+  {id:'comm1', type:'comm', name:'Comm Tower Alpha', x:460, y:55, priority:4, deps:['power1']},
+  {id:'shelter1', type:'shelter', name:'Shelter Alpha', x:130, y:400, priority:3, deps:[]},
+  {id:'shelter2', type:'shelter', name:'Shelter Bravo', x:600, y:410, priority:3, deps:[]},
+  {id:'warehouse1', type:'warehouse', name:'Supply Depot 1', x:690, y:210, priority:2, deps:['power1']},
+  {id:'bridge1', type:'bridge', name:'Harbor Bridge', x:390, y:350, priority:4, deps:[]},
+  {id:'airport1', type:'airport', name:'Regional Airport', x:710, y:110, priority:3, deps:['power1','comm1']},
+  {id:'res1', type:'residential', name:'Downtown District', x:270, y:260, priority:1, deps:['power1','water1']},
+  {id:'res2', type:'residential', name:'Riverside Homes', x:170, y:180, priority:1, deps:['power1','water1']},
+  {id:'res3', type:'residential', name:'Eastgate Suburb', x:590, y:190, priority:1, deps:['power1','water1']},
+  {id:'port1', type:'port', name:'City Port', x:740, y:360, priority:2, deps:['power1']},
+];
+
+const TYPE_META = {
+  power:{label:'Power', color:'#F4A100', short:'PWR'},
+  water:{label:'Water', color:'#4CC9F0', short:'WTR'},
+  hospital:{label:'Hospital', color:'#FF4655', short:'HOS'},
+  fire:{label:'Fire Station', color:'#FF7A45', short:'FIR'},
+  police:{label:'Police', color:'#6C7CE0', short:'POL'},
+  comm:{label:'Comm Tower', color:'#33C17A', short:'COM'},
+  shelter:{label:'Shelter', color:'#B885F0', short:'SHL'},
+  warehouse:{label:'Warehouse', color:'#C9A24C', short:'WHS'},
+  bridge:{label:'Bridge', color:'#9AA5B1', short:'BRG'},
+  airport:{label:'Airport', color:'#4CC9F0', short:'APT'},
+  residential:{label:'Residential', color:'#7FA8C9', short:'RES'},
+  port:{label:'Port', color:'#4C9FF0', short:'PRT'},
+};
+
+const AGENTS = ['Commander AI','Medical AI','Power AI','Water AI','Transport AI','Fire AI','Construction AI'];
+
+// Physical road connections (visual only — separate from utility dependency graph)
+const ROADS = [
+  ['power1','res2'],['res2','hosp1'],['hosp1','res1'],['res1','fire1'],['fire1','bridge1'],
+  ['bridge1','shelter1'],['power1','police1'],['police1','comm1'],['comm1','airport1'],
+  ['airport1','res3'],['res3','hosp2'],['hosp2','warehouse1'],['warehouse1','port1'],
+  ['port1','shelter2'],['water1','comm1'],['water1','res3'],['police1','hosp1'],['bridge1','res1'],
+];
+
+// Decorative low-rise skyline silhouette, purely atmospheric (non-interactive)
+function skylineSilhouette(w,h){
+  let bldgs='';
+  let x=0;
+  const seed=[18,34,22,40,16,28,45,20,30,24,38,17,26,32,19,42,23,29];
+  let i=0;
+  while(x<w){
+    const bw = 22 + (seed[i%seed.length]%14);
+    const bh = 10 + (seed[i%seed.length]%26);
+    bldgs += `<rect x="${x}" y="${h-bh}" width="${bw-2}" height="${bh}" fill="#0D1420"/>`;
+    x += bw; i++;
+  }
+  return `<g opacity="0.55">${bldgs}</g>`;
+}
+
+// Returns SVG markup for a stylized building icon centered at (0,0), sized ~s
+function buildingIcon(type, s, accent, muted){
+  const body = muted ? '#171F2C' : '#1C2635';
+  const stroke = accent;
+  switch(type){
+    case 'residential':
+      return `
+        <polygon points="${-s*0.5},${-s*0.02} 0,${-s*0.5} ${s*0.5},${-s*0.02}" fill="${stroke}"/>
+        <rect x="${-s*0.38}" y="${-s*0.02}" width="${s*0.76}" height="${s*0.5}" fill="${body}" stroke="${stroke}" stroke-width="1.1"/>
+        <rect x="${-s*0.09}" y="${s*0.2}" width="${s*0.18}" height="${s*0.28}" fill="${stroke}" opacity="0.85"/>
+        <rect x="${-s*0.26}" y="${s*0.06}" width="${s*0.1}" height="${s*0.1}" fill="${stroke}" opacity="0.5"/>
+        <rect x="${s*0.16}" y="${s*0.06}" width="${s*0.1}" height="${s*0.1}" fill="${stroke}" opacity="0.5"/>`;
+    case 'hospital':
+      return `
+        <rect x="${-s*0.42}" y="${-s*0.46}" width="${s*0.84}" height="${s*0.94}" rx="2" fill="${body}" stroke="${stroke}" stroke-width="1.3"/>
+        <rect x="${-s*0.06}" y="${-s*0.24}" width="${s*0.12}" height="${s*0.48}" fill="${stroke}"/>
+        <rect x="${-s*0.24}" y="${-s*0.06}" width="${s*0.48}" height="${s*0.12}" fill="${stroke}"/>
+        <rect x="${-s*0.38}" y="${s*0.32}" width="${s*0.14}" height="${s*0.16}" fill="${stroke}" opacity="0.6"/>
+        <rect x="${s*0.24}" y="${s*0.32}" width="${s*0.14}" height="${s*0.16}" fill="${stroke}" opacity="0.6"/>`;
+    case 'power':
+      return `
+        <rect x="${-s*0.4}" y="${-s*0.18}" width="${s*0.8}" height="${s*0.66}" fill="${body}" stroke="${stroke}" stroke-width="1.2"/>
+        <rect x="${-s*0.28}" y="${-s*0.5}" width="${s*0.14}" height="${s*0.34}" fill="${body}" stroke="${stroke}" stroke-width="1"/>
+        <rect x="${s*0.12}" y="${-s*0.42}" width="${s*0.14}" height="${s*0.26}" fill="${body}" stroke="${stroke}" stroke-width="1"/>
+        <polygon points="0,${-s*0.06} ${s*0.14},${-s*0.06} ${-s*0.02},${s*0.24} ${s*0.1},${s*0.24} ${-s*0.16},${s*0.5} ${-s*0.06},${s*0.16} ${-s*0.18},${s*0.16}" fill="${stroke}"/>`;
+    case 'water':
+      return `
+        <rect x="${-s*0.08}" y="${-s*0.05}" width="${s*0.16}" height="${s*0.5}" fill="${stroke}" opacity="0.7"/>
+        <ellipse cx="0" cy="${-s*0.15}" rx="${s*0.42}" ry="${s*0.24}" fill="${body}" stroke="${stroke}" stroke-width="1.3"/>
+        <path d="M ${-s*0.42} ${-s*0.15} A ${s*0.42} ${s*0.24} 0 0 0 ${s*0.42} ${-s*0.15} L ${s*0.42} ${s*0.05} A ${s*0.42} ${s*0.24} 0 0 1 ${-s*0.42} ${s*0.05} Z" fill="${body}" stroke="${stroke}" stroke-width="1.1"/>`;
+    case 'fire':
+      return `
+        <rect x="${-s*0.42}" y="${-s*0.3}" width="${s*0.84}" height="${s*0.78}" fill="${body}" stroke="${stroke}" stroke-width="1.2"/>
+        <rect x="${-s*0.3}" y="${s*0.06}" width="${s*0.24}" height="${s*0.42}" fill="${stroke}" opacity="0.35"/>
+        <path d="M ${s*0.14} ${-s*0.34} Q ${s*0.26} ${-s*0.5} ${s*0.16} ${-s*0.62} Q ${s*0.3} ${-s*0.56} ${s*0.26} ${-s*0.4} Q ${s*0.22} ${-s*0.5} ${s*0.14} ${-s*0.34} Z" fill="${stroke}"/>`;
+    case 'police':
+      return `
+        <rect x="${-s*0.4}" y="${-s*0.28}" width="${s*0.8}" height="${s*0.76}" fill="${body}" stroke="${stroke}" stroke-width="1.2"/>
+        <path d="M 0 ${-s*0.5} L ${s*0.16} ${-s*0.4} L ${s*0.16} ${-s*0.2} Q ${s*0.16} ${-s*0.02} 0 ${s*0.06} Q ${-s*0.16} ${-s*0.02} ${-s*0.16} ${-s*0.2} L ${-s*0.16} ${-s*0.4} Z" fill="${stroke}"/>`;
+    case 'comm':
+      return `
+        <line x1="0" y1="${-s*0.55}" x2="0" y2="${s*0.2}" stroke="${stroke}" stroke-width="2"/>
+        <line x1="${-s*0.2}" y1="${-s*0.3}" x2="${s*0.2}" y2="${-s*0.3}" stroke="${stroke}" stroke-width="1.4"/>
+        <line x1="${-s*0.14}" y1="${-s*0.08}" x2="${s*0.14}" y2="${-s*0.08}" stroke="${stroke}" stroke-width="1.4"/>
+        <circle cx="0" cy="${-s*0.6}" r="3.2" fill="${stroke}"/>
+        <rect x="${-s*0.16}" y="${s*0.2}" width="${s*0.32}" height="${s*0.2}" fill="${body}" stroke="${stroke}" stroke-width="1"/>`;
+    case 'shelter':
+      return `
+        <polygon points="${-s*0.42},${s*0.22} 0,${-s*0.42} ${s*0.42},${s*0.22} ${s*0.3},${s*0.22} 0,${-s*0.2} ${-s*0.3},${s*0.22}" fill="${stroke}"/>
+        <polygon points="0,${-s*0.42} ${s*0.16},${s*0.06} ${-s*0.16},${s*0.06}" fill="${body}" stroke="${stroke}" stroke-width="1"/>`;
+    case 'warehouse':
+      return `
+        <rect x="${-s*0.46}" y="${-s*0.14}" width="${s*0.92}" height="${s*0.62}" fill="${body}" stroke="${stroke}" stroke-width="1.2"/>
+        <polygon points="${-s*0.5},${-s*0.14} 0,${-s*0.36} ${s*0.5},${-s*0.14}" fill="${stroke}" opacity="0.85"/>
+        <rect x="${-s*0.14}" y="${s*0.14}" width="${s*0.28}" height="${s*0.34}" fill="${stroke}" opacity="0.4"/>`;
+    case 'bridge':
+      return `
+        <line x1="${-s*0.55}" y1="${s*0.1}" x2="${s*0.55}" y2="${s*0.1}" stroke="${stroke}" stroke-width="3"/>
+        <line x1="${-s*0.3}" y1="${s*0.1}" x2="${-s*0.3}" y2="${-s*0.46}" stroke="${stroke}" stroke-width="2"/>
+        <line x1="${s*0.3}" y1="${s*0.1}" x2="${s*0.3}" y2="${-s*0.46}" stroke="${stroke}" stroke-width="2"/>
+        <path d="M ${-s*0.3} ${-s*0.44} Q 0 ${-s*0.66} ${s*0.3} ${-s*0.44}" fill="none" stroke="${stroke}" stroke-width="1.6"/>
+        <line x1="0" y1="${-s*0.6}" x2="0" y2="${s*0.1}" stroke="${stroke}" stroke-width="1" opacity="0.6"/>`;
+    case 'airport':
+      return `
+        <rect x="${-s*0.14}" y="${-s*0.1}" width="${s*0.28}" height="${s*0.48}" fill="${body}" stroke="${stroke}" stroke-width="1.2"/>
+        <ellipse cx="0" cy="${-s*0.16}" rx="${s*0.22}" ry="${s*0.13}" fill="${body}" stroke="${stroke}" stroke-width="1.3"/>
+        <line x1="${-s*0.5}" y1="${s*0.4}" x2="${s*0.5}" y2="${s*0.4}" stroke="${stroke}" stroke-width="1" stroke-dasharray="4,3" opacity="0.7"/>`;
+    case 'port':
+      return `
+        <line x1="0" y1="${-s*0.55}" x2="0" y2="${s*0.3}" stroke="${stroke}" stroke-width="2.2"/>
+        <line x1="0" y1="${-s*0.5}" x2="${s*0.4}" y2="${-s*0.5}" stroke="${stroke}" stroke-width="2"/>
+        <line x1="${s*0.36}" y1="${-s*0.5}" x2="${s*0.36}" y2="${-s*0.28}" stroke="${stroke}" stroke-width="1.4"/>
+        <rect x="${-s*0.4}" y="${s*0.14}" width="${s*0.8}" height="${s*0.18}" fill="${body}" stroke="${stroke}" stroke-width="1"/>`;
+    default:
+      return `<rect x="${-s*0.35}" y="${-s*0.35}" width="${s*0.7}" height="${s*0.7}" fill="${body}" stroke="${stroke}" stroke-width="1.2"/>`;
+  }
+}
+
+const DISASTERS = {
+  earthquake:{label:'Earthquake', color:'#F4A100', logVerb:'shockwave', multiplier:{bridge:1.6, power:1.3, hospital:1.1, default:1}},
+  flood:{label:'Flood', color:'#4CC9F0', logVerb:'floodwater', multiplier:{water:1.5, residential:1.4, warehouse:1.3, default:0.9}},
+  wildfire:{label:'Wildfire', color:'#FF4655', logVerb:'fire front', multiplier:{residential:1.5, warehouse:1.6, shelter:1.2, default:0.8}, spreads:true},
+  gridfail:{label:'Power Grid Failure', color:'#B885F0', logVerb:'grid collapse', direct:'power'},
+};
+
+/* ============ STATE ============ */
+let state = {
+  nodes: NODE_DEFS.map(n => ({...n, health:100, status:'operational'})),
+  tick: 0,
+  log: [],
+  epicenter: null,
+  activeDisaster: null,
+  disasterRadius: 140,
+  disasterMagnitude: 6,
+  armMode: false,
+  selectedDisaster: 'earthquake',
+  recoveryMode: false,
+  activeAgents: new Set(),
+  wildfireTicks: 0,
+};
+
+function pushLog(text, level, agent){
+  state.log.unshift({text, level: level||'info', agent: agent||null, t: state.tick});
+  if(state.log.length > 60) state.log.pop();
+}
+
+function distance(a,b){ return Math.hypot(a.x-b.x, a.y-b.y); }
+
+function statusFromHealth(h){
+  if(h<=0) return 'destroyed';
+  if(h<=15) return 'critical';
+  if(h<=55) return 'damaged';
+  return 'operational';
+}
+
+/* ============ DISASTER LOGIC ============ */
+function triggerDisaster(x,y){
+  const dtype = state.selectedDisaster;
+  const d = DISASTERS[dtype];
+  state.activeDisaster = dtype;
+  state.epicenter = {x,y};
+  state.wildfireTicks = 0;
+  pushLog(`${d.label} detected — epicenter locked, magnitude ${state.disasterMagnitude}. Damage assessment underway.`, 'critical', 'Commander AI');
+  state.activeAgents = new Set(['Commander AI']);
+
+  if(d.direct){
+    const n = state.nodes.find(n=>n.type===d.direct);
+    if(n){ n.health = 0; n.status='destroyed'; pushLog(`${n.name} offline — total grid collapse.`, 'critical', 'Power AI'); state.activeAgents.add('Power AI');}
+    return;
+  }
+  applyRadiusDamage(x,y,state.disasterRadius,state.disasterMagnitude,d);
+}
+
+function applyRadiusDamage(x,y,radius,magnitude,d){
+  state.nodes.forEach(n=>{
+    const dist = distance({x,y},n);
+    if(dist<=radius){
+      const falloff = 1 - dist/radius;
+      const mult = d.multiplier[n.type] ?? d.multiplier.default ?? 1;
+      const dmg = magnitude * 9 * falloff * mult;
+      const before = n.health;
+      n.health = Math.max(0, Math.round(n.health - dmg));
+      const newStatus = statusFromHealth(n.health);
+      if(newStatus !== n.status && n.health < before){
+        n.status = newStatus;
+        const lvl = newStatus==='destroyed'?'critical':newStatus==='critical'?'critical':newStatus==='damaged'?'warning':'info';
+        pushLog(`${n.name} → ${newStatus.toUpperCase()} (${n.health}% integrity).`, lvl);
+      } else {
+        n.status = newStatus;
+      }
+    }
+  });
+}
+
+/* ============ CASCADE + RECOVERY TICK ============ */
+function tickCascade(){
+  state.nodes.forEach(n=>{
+    if(n.deps.length===0) return;
+    const failedDeps = n.deps.map(id=>state.nodes.find(x=>x.id===id)).filter(d=>d && (d.status==='destroyed' || d.status==='critical'));
+    if(failedDeps.length>0 && n.health>5){
+      const decay = failedDeps.length * 3;
+      const before = n.health;
+      n.health = Math.max(5, Math.round(n.health - decay));
+      const newStatus = statusFromHealth(n.health);
+      if(newStatus!==n.status){
+        n.status=newStatus;
+        const depNames = failedDeps.map(d=>d.name).join(', ');
+        const agent = n.type==='hospital'?'Medical AI':n.type==='residential'?'Transport AI':'Commander AI';
+        state.activeAgents.add(agent);
+        pushLog(`<span class="agent">${agent}:</span> ${n.name} degrading — cascading failure from ${depNames}. Now ${newStatus.toUpperCase()}.`,'warning', agent);
+      } else {
+        n.status = newStatus;
+      }
+    }
+  });
+
+  // wildfire spread
+  if(state.activeDisaster==='wildfire' && state.epicenter){
+    state.wildfireTicks++;
+    if(state.wildfireTicks % 2 === 0 && state.disasterRadius < 260){
+      state.disasterRadius += 14;
+      applyRadiusDamage(state.epicenter.x, state.epicenter.y, state.disasterRadius, state.disasterMagnitude*0.4, DISASTERS.wildfire);
+      pushLog(`<span class="agent">Fire AI:</span> Fire front expanding — radius now ${state.disasterRadius}px. Spread rate accelerating.`,'warning','Fire AI');
+      state.activeAgents.add('Fire AI');
+    }
+  }
+}
+
+let debateShown = false;
+function tickRecovery(){
+  const damaged = state.nodes.filter(n=>n.health<100).sort((a,b)=> (b.priority*(100-b.health)) - (a.priority*(100-a.health)));
+  if(damaged.length===0){
+    if(state.recoveryMode){
+      pushLog(`<span class="agent">Commander AI:</span> Full recovery achieved. All systems nominal.`,'success','Commander AI');
+      state.recoveryMode = false;
+    }
+    return;
+  }
+
+  if(!debateShown){
+    const top3 = damaged.slice(0,3);
+    const lines = top3.map(n=>{
+      const agent = n.type==='hospital'?'Medical AI':n.type==='power'?'Power AI':n.type==='water'?'Water AI':n.type==='bridge'?'Construction AI':n.type==='fire'?'Fire AI':'Transport AI';
+      state.activeAgents.add(agent);
+      return `<span class="agent">${agent}:</span> ${n.name} at ${n.health}% — priority ${n.priority}, ${n.deps.length} dependents. Recommend immediate repair.`;
+    });
+    lines.forEach(l=>pushLog(l,'info'));
+    pushLog(`<span class="agent">Commander AI:</span> Evaluated ${damaged.length} damaged assets. Repair sequence approved — highest priority × severity first.`,'success','Commander AI');
+    state.activeAgents.add('Commander AI');
+    debateShown = true;
+  }
+
+  const crewCapacity = 3;
+  const targets = damaged.slice(0, crewCapacity);
+  targets.forEach(n=>{
+    const before = n.health;
+    n.health = Math.min(100, n.health + 6);
+    const newStatus = statusFromHealth(n.health);
+    if(newStatus!==n.status){
+      n.status = newStatus;
+      if(n.health===100){
+        pushLog(`${n.name} fully restored to OPERATIONAL.`,'success');
+      }
+    } else { n.status = newStatus; }
+  });
+}
+
+/* ============ RENDER ============ */
+let simInterval = null;
+
+function categoryHealth(types){
+  const nodes = state.nodes.filter(n=>types.includes(n.type));
+  if(nodes.length===0) return 100;
+  return Math.round(nodes.reduce((s,n)=>s+n.health,0)/nodes.length);
+}
+
+function overallHealth(){
+  return Math.round(state.nodes.reduce((s,n)=>s+n.health,0)/state.nodes.length);
+}
+
+function healthColor(h){
+  if(h>=70) return '#33C17A';
+  if(h>=40) return '#F4A100';
+  return '#FF4655';
+}
+
+function renderDash(){
+  const cats = [
+    {label:'City Health', val: overallHealth()},
+    {label:'Power Grid', val: categoryHealth(['power'])},
+    {label:'Water Network', val: categoryHealth(['water'])},
+    {label:'Healthcare', val: categoryHealth(['hospital'])},
+    {label:'Safety (Fire/Police)', val: categoryHealth(['fire','police'])},
+    {label:'Transport', val: categoryHealth(['bridge','airport','port'])},
+    {label:'Housing', val: categoryHealth(['residential'])},
+  ];
+  return cats.map(c=>`
+    <div class="dash-cell">
+      <div class="label">${c.label}</div>
+      <div class="bar-track"><div class="bar-fill" style="width:${c.val}%;background:${healthColor(c.val)}"></div></div>
+      <div class="num" style="color:${healthColor(c.val)}">${c.val}%</div>
+    </div>
+  `).join('');
+}
+
+function renderMap(){
+  const w=820,h=460;
+  const activeColor = state.activeDisaster ? DISASTERS[state.activeDisaster].color : '#4CC9F0';
+  let defs = `<defs>
+    <radialGradient id="epiGrad" cx="50%" cy="50%" r="50%">
+      <stop offset="0%" stop-color="${activeColor}" stop-opacity="0.4"/>
+      <stop offset="60%" stop-color="${activeColor}" stop-opacity="0.12"/>
+      <stop offset="100%" stop-color="${activeColor}" stop-opacity="0"/>
+    </radialGradient>
+    <radialGradient id="vignette" cx="50%" cy="45%" r="75%">
+      <stop offset="60%" stop-color="#000000" stop-opacity="0"/>
+      <stop offset="100%" stop-color="#000000" stop-opacity="0.55"/>
+    </radialGradient>
+    <filter id="softGlow" x="-60%" y="-60%" width="220%" height="220%">
+      <feGaussianBlur stdDeviation="2.2" result="blur"/>
+      <feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge>
+    </filter>
+    <filter id="dropShadow" x="-40%" y="-40%" width="180%" height="180%">
+      <feDropShadow dx="0" dy="2" stdDeviation="2" flood-color="#000" flood-opacity="0.55"/>
+    </filter>
+  </defs>`;
+
+  const sky = skylineSilhouette(w,h);
+
+  // Roads — physical street network beneath everything
+  let roads = ROADS.map(([aId,bId])=>{
+    const a = state.nodes.find(n=>n.id===aId), b = state.nodes.find(n=>n.id===bId);
+    if(!a||!b) return '';
+    return `<line x1="${a.x}" y1="${a.y}" x2="${b.x}" y2="${b.y}" stroke="#232E3E" stroke-width="4" stroke-linecap="round"/>
+            <line x1="${a.x}" y1="${a.y}" x2="${b.x}" y2="${b.y}" stroke="#39485E" stroke-width="1" stroke-dasharray="6,6" opacity="0.6"/>`;
+  }).join('');
+
+  // Utility dependency lines (glowing when broken)
+  let deps = '';
+  state.nodes.forEach(n=>{
+    n.deps.forEach(depId=>{
+      const dep = state.nodes.find(x=>x.id===depId);
+      if(!dep) return;
+      const bad = dep.status==='destroyed'||dep.status==='critical';
+      deps += `<line x1="${dep.x}" y1="${dep.y}" x2="${n.x}" y2="${n.y}" stroke="${bad?'#FF4655':'#3A6E8F'}" stroke-width="${bad?2:1.2}" stroke-dasharray="${bad?'2,4':'1,5'}" opacity="${bad?0.9:0.55}" ${bad?'filter="url(#softGlow)"':''}/>`;
+    });
+  });
+
+  let epi = '';
+  if(state.epicenter){
+    const d = DISASTERS[state.activeDisaster];
+    const rings = [0,0.6,1.2].map(delay=>`
+      <circle cx="${state.epicenter.x}" cy="${state.epicenter.y}" r="6" fill="none" stroke="${d.color}" stroke-width="2">
+        <animate attributeName="r" from="6" to="40" dur="1.8s" begin="${delay}s" repeatCount="indefinite"/>
+        <animate attributeName="opacity" from="0.85" to="0" dur="1.8s" begin="${delay}s" repeatCount="indefinite"/>
+      </circle>`).join('');
+    epi = `<circle cx="${state.epicenter.x}" cy="${state.epicenter.y}" r="${state.disasterRadius}" fill="url(#epiGrad)"/>
+      <circle cx="${state.epicenter.x}" cy="${state.epicenter.y}" r="${state.disasterRadius}" fill="none" stroke="${d.color}" stroke-width="1" opacity="0.5" stroke-dasharray="3,5"/>
+      <circle cx="${state.epicenter.x}" cy="${state.epicenter.y}" r="9" fill="${d.color}" filter="url(#softGlow)"/>
+      <circle cx="${state.epicenter.x}" cy="${state.epicenter.y}" r="4" fill="#fff"/>
+      ${rings}`;
+  }
+
+  // radar sweep signature element
+  const sweepAngle = (state.tick * 6) % 360;
+  const sweep = `<g opacity="0.10">
+      <line x1="${w/2}" y1="${h/2}" x2="${w/2 + 900*Math.cos(sweepAngle*Math.PI/180)}" y2="${h/2 + 900*Math.sin(sweepAngle*Math.PI/180)}" stroke="#4CC9F0" stroke-width="110" stroke-linecap="round" style="mix-blend-mode:screen;"/>
+    </g>`;
+
+  let nodesSvg = state.nodes.map(n=>{
+    const color = healthColor(n.health);
+    const s = n.priority>=4? 40 : n.priority>=2? 32 : 26;
+    const dim = n.status!=='operational';
+    const icon = buildingIcon(n.type, s, dim ? color : '#3A6E8F', dim);
+    const isBad = n.status==='critical'||n.status==='destroyed';
+    const pulse = isBad ? `<circle cx="0" cy="0" r="${s*0.4}" fill="none" stroke="${color}" stroke-width="1.5">
+        <animate attributeName="r" from="${s*0.4}" to="${s*0.9}" dur="1.4s" repeatCount="indefinite"/>
+        <animate attributeName="opacity" from="0.75" to="0" dur="1.4s" repeatCount="indefinite"/>
+      </circle>` : '';
+    const smoke = n.status==='destroyed' ? `<circle cx="${-s*0.1}" cy="${-s*0.55}" r="3" fill="#556070" opacity="0.5">
+        <animate attributeName="cy" from="${-s*0.55}" to="${-s*1.4}" dur="2.2s" repeatCount="indefinite"/>
+        <animate attributeName="opacity" from="0.5" to="0" dur="2.2s" repeatCount="indefinite"/>
+        <animate attributeName="r" from="3" to="8" dur="2.2s" repeatCount="indefinite"/>
+      </circle>` : '';
+    return `<g transform="translate(${n.x},${n.y})" filter="url(#dropShadow)">
+      ${pulse}
+      <ellipse cx="0" cy="${s*0.32}" rx="${s*0.42}" ry="${s*0.1}" fill="#000" opacity="0.35"/>
+      <g>${icon}</g>
+      ${smoke}
+      <circle cx="${s*0.4}" cy="${-s*0.42}" r="4.5" fill="#0B1017" stroke="${color}" stroke-width="1.5"/>
+      <circle cx="${s*0.4}" cy="${-s*0.42}" r="1.8" fill="${color}"/>
+      <text x="0" y="${s*0.55+14}" text-anchor="middle" font-size="9" font-family="IBM Plex Mono" fill="#93A0B2">${n.name}</text>
+      <text x="0" y="${s*0.55+25}" text-anchor="middle" font-size="8.5" font-family="IBM Plex Mono" font-weight="600" fill="${color}">${n.health}%</text>
+    </g>`;
+  }).join('');
+
+  return `<svg viewBox="0 0 ${w} ${h}" onclick="handleMapClick(event)">${defs}${sky}${roads}${sweep}${deps}${epi}${nodesSvg}<rect x="0" y="0" width="${w}" height="${h}" fill="url(#vignette)" pointer-events="none"/></svg>`;
+}
+
+function renderLog(){
+  if(state.log.length===0) return `<div class="hint">Awaiting first event. Trigger a disaster or run autonomous recovery to populate the AI decision feed.</div>`;
+  return `<div class="log-list">${state.log.map(e=>`<div class="log-entry ${e.level}"><span class="t">T+${e.t}</span>${e.text}</div>`).join('')}</div>`;
+}
+
+function renderAgents(){
+  return AGENTS.map(a=>`<span class="agent-chip ${state.activeAgents.has(a)?'active':''}">${a}</span>`).join('');
+}
+
+function render(){
+  const app = document.getElementById('app');
+  app.innerHTML = `
+    <header>
+      <div class="brand">
+        <div class="mark"></div>
+        <div class="brand-text">
+          <h1>NEXUS</h1>
+          <div class="sub">Autonomous City Recovery Command</div>
+        </div>
+      </div>
+      <div class="header-right">
+        <div class="clock-block">
+          <div class="label">Simulation Tick</div>
+          <div class="val">T+${state.tick}</div>
+        </div>
+        <div class="health-badge">
+          <div class="ring" style="border:2px solid ${healthColor(overallHealth())};color:${healthColor(overallHealth())}">${overallHealth()}</div>
+          <div>
+            <div class="label" style="font-size:9px;color:var(--muted);text-transform:uppercase;">City Health</div>
+            <div style="font-size:11px;color:${healthColor(overallHealth())}">${overallHealth()>=70?'STABLE':overallHealth()>=40?'DEGRADED':'CRITICAL'}</div>
+          </div>
+        </div>
+      </div>
+    </header>
+
+    <div class="dash">${renderDash()}</div>
+
+    <div class="main">
+      <div class="panel">
+        <div class="section">
+          <div class="section-title">Crisis Sandbox</div>
+          <label class="field">Disaster Type</label>
+          <select id="disasterSelect" onchange="onDisasterChange(this.value)">
+            ${Object.entries(DISASTERS).map(([k,v])=>`<option value="${k}" ${state.selectedDisaster===k?'selected':''}>${v.label}</option>`).join('')}
+          </select>
+          <label class="field">Magnitude <span class="range-val">${state.disasterMagnitude}</span></label>
+          <input type="range" min="1" max="10" value="${state.disasterMagnitude}" oninput="onMagChange(this.value)">
+          <label class="field">Radius <span class="range-val">${state.disasterRadius}px</span></label>
+          <input type="range" min="60" max="240" value="${state.disasterRadius}" oninput="onRadChange(this.value)">
+          <button class="btn-primary" onclick="armDisaster()">${state.armMode ? 'Click Map To Strike' : 'Arm Disaster'}</button>
+          ${state.armMode ? '<div class="armed-note">Armed. Click any point on the city map to trigger impact at that location.</div>' : ''}
+        </div>
+
+        <div class="section">
+          <div class="section-title">God Mode</div>
+          <button class="btn-ghost btn-danger" onclick="godRandomFailure()">⚠ Random Building Failure</button>
+          <button class="btn-ghost" onclick="godRepairAll()">✓ Repair All Infrastructure</button>
+          <button class="btn-ghost btn-danger" onclick="godCutPower()">⚡ Cut Power Grid</button>
+        </div>
+
+        <div class="section">
+          <div class="section-title">Recovery</div>
+          <button class="btn-recover ${state.recoveryMode?'active':''}" onclick="toggleRecovery()">
+            ${state.recoveryMode ? '● Autonomous Recovery Active' : 'Recover My City'}
+          </button>
+          <div class="hint">AI agents debate, prioritize by dependency impact and priority tier, and dispatch repair crews automatically.</div>
+        </div>
+      </div>
+
+      <div class="panel map-wrap" style="border-right:1px solid var(--line);padding:0;">
+        ${renderMap()}
+        <div class="tick-counter">Nodes: <b>${state.nodes.length}</b> · Operational: <b>${state.nodes.filter(n=>n.status==='operational').length}</b></div>
+        <div class="legend">
+          <div class="legend-item"><span class="legend-dot" style="background:#33C17A"></span>Operational</div>
+          <div class="legend-item"><span class="legend-dot" style="background:#F4A100"></span>Damaged</div>
+          <div class="legend-item"><span class="legend-dot" style="background:#FF4655"></span>Critical / Destroyed</div>
+        </div>
+      </div>
+
+      <div class="panel">
+        <div class="section-title">AI Decision Feed</div>
+        ${renderLog()}
+        <div class="section" style="margin-top:18px;">
+          <div class="section-title">Agent Status</div>
+          <div class="agent-strip">${renderAgents()}</div>
+        </div>
+      </div>
+    </div>
+  `;
+}
+
+/* ============ HANDLERS ============ */
+function onDisasterChange(v){ state.selectedDisaster = v; }
+function onMagChange(v){ state.disasterMagnitude = parseInt(v); render(); }
+function onRadChange(v){ state.disasterRadius = parseInt(v); render(); }
+function armDisaster(){
+  if(state.armMode){ state.armMode=false; render(); return; }
+  state.armMode = true; render();
+}
+function handleMapClick(evt){
+  if(!state.armMode) return;
+  const svg = evt.currentTarget;
+  const pt = svg.createSVGPoint();
+  pt.x = evt.clientX; pt.y = evt.clientY;
+  const loc = pt.matrixTransform(svg.getScreenCTM().inverse());
+  state.armMode = false;
+  debateShown = false;
+  triggerDisaster(Math.round(loc.x), Math.round(loc.y));
+  render();
+}
+function godRandomFailure(){
+  const candidates = state.nodes.filter(n=>n.health>20);
+  if(candidates.length===0) return;
+  const n = candidates[Math.floor(Math.random()*candidates.length)];
+  n.health = Math.max(0, n.health - 55);
+  n.status = statusFromHealth(n.health);
+  pushLog(`<span class="agent">God Mode:</span> ${n.name} manually disabled — now ${n.status.toUpperCase()}.`,'critical');
+  render();
+}
+function godRepairAll(){
+  state.nodes.forEach(n=>{ n.health=100; n.status='operational'; });
+  state.epicenter=null; state.activeDisaster=null;
+  pushLog(`<span class="agent">God Mode:</span> All infrastructure manually restored to 100%.`,'success');
+  render();
+}
+function godCutPower(){
+  const n = state.nodes.find(n=>n.type==='power');
+  n.health=0; n.status='destroyed';
+  pushLog(`<span class="agent">God Mode:</span> Power grid manually severed.`,'critical');
+  render();
+}
+function toggleRecovery(){
+  state.recoveryMode = !state.recoveryMode;
+  debateShown = false;
+  if(state.recoveryMode){
+    pushLog(`<span class="agent">Commander AI:</span> Recovery mode engaged. Assessing city-wide damage...`,'info','Commander AI');
+  } else {
+    pushLog(`Recovery mode paused by operator.`,'info');
+  }
+  render();
+}
+
+/* ============ SIM LOOP ============ */
+function simTick(){
+  state.tick++;
+  if(state.activeDisaster) tickCascade();
+  if(state.recoveryMode) tickRecovery();
+  render();
+}
+simInterval = setInterval(simTick, 1100);
+
+render();
+</script>
+</body>
+</html>
