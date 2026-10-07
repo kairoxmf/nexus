@@ -16,7 +16,7 @@ body {
 }
 
 ::selection {
-  background: #c8a15c;
+  background: #E9A51F;
   color: #fff;
 }
 
@@ -166,7 +166,7 @@ img {
 
 /* ---------- misc ---------- */
 .divider-fade {
-  background: linear-gradient(to right, transparent, #c8a15c, transparent);
+  background: linear-gradient(to right, transparent, #E9A51F, transparent);
 }
 
 @media (prefers-reduced-motion: reduce) {
@@ -186,6 +186,6 @@ img {
 }
 
 :focus-visible {
-  outline: 2px solid #c8a15c;
+  outline: 2px solid #E9A51F;
   outline-offset: 2px;
 }

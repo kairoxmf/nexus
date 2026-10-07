@@ -1,27 +1,28 @@
 import { Link } from "react-router-dom";
-import { ArrowRight, Check, Compass, HandHeart, ShieldCheck } from "lucide-react";
+import { ArrowRight, CheckCircle2 } from "lucide-react";
 import PageHero from "../components/ui/PageHero";
-import Reveal from "../components/ui/Reveal";
 import SectionHeading from "../components/ui/SectionHeading";
-import CtaSection from "../components/home/CtaSection";
+import Reveal from "../components/ui/Reveal";
+import StatsSection from "../components/common/StatsSection";
 import TeamGrid from "../components/team/TeamGrid";
-import { ABOUT_PAGE_IMAGES, STATS } from "../data/site";
+import CtaSection from "../components/common/CtaSection";
+import { STATS, TEAM, BRAND } from "../data/site";
+
+const STORY_IMG =
+  "https://images.unsplash.com/photo-1521737604893-d14cc237f11d?auto=format&fit=crop&w=1400&q=80";
 
 const VALUES = [
   {
-    Icon: ShieldCheck,
-    title: "Integrity",
-    description: "Straight answers, full disclosure and advice we'd give our own family.",
+    title: "Safety Above All",
+    text: "Every schedule, every budget and every decision starts with the people on the site.",
   },
   {
-    Icon: Compass,
-    title: "Expertise",
-    description: "Decades of combined experience across luxury, investment and development markets.",
+    title: "Precision Engineering",
+    text: "We measure twice — in the office, in the model and in the field — so we cut once.",
   },
   {
-    Icon: HandHeart,
-    title: "Client-First",
-    description: "Your goals set the agenda. We succeed only when you do.",
+    title: "Honest Partnerships",
+    text: "Transparent budgets, real schedules and advice we would give our own family.",
   },
 ];
 
@@ -29,81 +30,66 @@ export default function About() {
   return (
     <>
       <PageHero
-        eyebrow="About Us"
-        title="A Higher Standard of Real Estate"
-        description="Horizon Properties was founded on a simple belief: exceptional properties deserve exceptional representation."
+        eyebrow="About Built Right"
+        title="Three Decades of Building It Right."
+        description="From a two-office shop to one of the region's most trusted builders — our story is written in the skylines we've helped shape."
       />
 
       {/* Story */}
-      <section className="bg-white py-20 lg:py-28">
-        <div className="shell grid items-center gap-16 lg:grid-cols-2 lg:gap-24">
-          <Reveal>
-            <div className="flex gap-4 sm:gap-5">
-              <div className="w-[63%] overflow-hidden rounded-2xl">
-                <img
-                  src={ABOUT_PAGE_IMAGES.main}
-                  alt="Modern luxury residence exterior"
-                  loading="lazy"
-                  className="zoom-img aspect-[4/5] w-full object-cover"
-                />
-              </div>
-              <div className="w-[37%] translate-y-10 overflow-hidden rounded-2xl">
-                <img
-                  src={ABOUT_PAGE_IMAGES.side}
-                  alt="Contemporary interior detail"
-                  loading="lazy"
-                  className="zoom-img aspect-[3/4] w-full object-cover"
-                />
-              </div>
-            </div>
+      <section className="py-20 lg:py-24">
+        <div className="shell grid items-center gap-12 lg:grid-cols-2 lg:gap-16">
+          <Reveal className="overflow-hidden rounded-xl">
+            <img
+              src={STORY_IMG}
+              alt="Built Right project team collaborating on site"
+              loading="lazy"
+              className="zoom-img aspect-[16/11] w-full object-cover"
+            />
           </Reveal>
-
           <Reveal delay={120}>
             <span className="eyebrow">Our Story</span>
-            <h2 className="mt-4 text-3xl font-extrabold leading-[1.1] text-ink sm:text-4xl">
-              Built on Trust, Measured by Results
+            <h2 className="mt-3 text-3xl font-extrabold leading-[1.12] text-ink sm:text-4xl">
+              Founded on Craft. Growing on Trust.
             </h2>
-            <p className="mt-6 leading-relaxed text-muted">
-              Since our founding, Horizon Properties has grown from a boutique
-              brokerage into a full-service premium agency — without ever losing
-              the personal attention that started it all. We represent a
-              select number of clients at a time, so every engagement gets the
-              focus it deserves.
+            <p className="mt-5 text-[15px] leading-relaxed text-muted">
+              Built Right Construction was founded in {2026 - 30} with a single crew and a stubborn
+              belief: buildings should be delivered the way they were promised. Three decades and
+              500 projects later, that belief still runs the company.
             </p>
-            <p className="mt-4 leading-relaxed text-muted">
-              Our advisors are market specialists, not order-takers. They walk
-              every property, know every street, and negotiate every contract
-              as if it were their own.
+            <p className="mt-4 text-[15px] leading-relaxed text-muted">
+              Today our teams deliver commercial towers, custom residences, industrial facilities
+              and complex renovations across the country — self-performing the critical trades and
+              holding one accountable line from first survey to final handover.
             </p>
-            <div className="mt-9 grid grid-cols-2 gap-6 border-t border-line pt-8 sm:grid-cols-4 lg:grid-cols-2 xl:grid-cols-4">
-              {STATS.map((stat) => (
-                <div key={stat.label}>
-                  <p className="text-2xl font-extrabold text-gold lg:text-[26px]">{stat.value}</p>
-                  <p className="mt-1 text-xs font-bold uppercase tracking-wider text-muted">{stat.label}</p>
-                </div>
-              ))}
-            </div>
+            <ul className="mt-7 space-y-3">
+              {["Self-performed concrete, steel and carpentry", "In-house engineering and pre-construction", "One accountable point of contact per project"].map(
+                (item) => (
+                  <li key={item} className="flex items-start gap-3 text-[14.5px] font-semibold text-ink">
+                    <CheckCircle2 className="mt-0.5 h-5 w-5 shrink-0 text-gold" aria-hidden="true" />
+                    {item}
+                  </li>
+                ),
+              )}
+            </ul>
           </Reveal>
         </div>
       </section>
 
       {/* Values */}
-      <section className="bg-ivory py-20 lg:py-28">
+      <section className="bg-mist py-20 lg:py-24">
         <div className="shell">
           <SectionHeading
-            eyebrow="Our Values"
-            title="What We Stand For"
-            description="Three principles guide every recommendation, negotiation and handshake."
+            eyebrow="What Guides Us"
+            title="The Values We Build By."
+            align="center"
           />
-          <div className="mt-14 grid gap-6 md:grid-cols-3">
-            {VALUES.map(({ Icon, title, description }, i) => (
-              <Reveal key={title} delay={i * 100}>
-                <div className="group h-full rounded-2xl border border-line bg-white p-8 shadow-sm transition-all duration-300 hover:-translate-y-1 hover:shadow-xl hover:shadow-navy/10">
-                  <span className="grid h-12 w-12 place-items-center rounded-xl bg-gold/10 text-gold transition-colors duration-300 group-hover:bg-gold group-hover:text-navy-abyss">
-                    <Icon className="h-6 w-6" aria-hidden="true" />
-                  </span>
-                  <h3 className="mt-6 text-xl font-extrabold text-ink">{title}</h3>
-                  <p className="mt-3 text-[15px] leading-relaxed text-muted">{description}</p>
+          <div className="mt-12 grid gap-6 md:grid-cols-3">
+            {VALUES.map((value, i) => (
+              <Reveal key={value.title} delay={i * 100}>
+                <div className="h-full rounded-xl border border-line bg-white p-8 shadow-card">
+                  <span className="text-3xl font-extrabold tabular-nums text-gold">0{i + 1}</span>
+                  <h3 className="mt-4 text-lg font-extrabold text-ink">{value.title}</h3>
+                  <p className="mt-2.5 text-[14px] leading-relaxed text-muted">{value.text}</p>
                 </div>
               </Reveal>
             ))}
@@ -111,27 +97,35 @@ export default function About() {
         </div>
       </section>
 
-      {/* Team preview */}
-      <section className="bg-white py-20 lg:py-28">
+      <StatsSection stats={STATS} image="https://images.unsplash.com/photo-1503328427499-d92d1ac3d174?auto=format&fit=crop&w=1800&q=80" />
+
+      {/* Team */}
+      <section className="py-20 lg:py-24">
         <div className="shell">
           <SectionHeading
-            eyebrow="Our Team"
-            title="The People Behind Horizon"
-            description="Meet the advisors who will actually handle your search, your tour and your negotiation."
+            eyebrow="Leadership"
+            title="Meet the Team Behind the Buildings."
+            action={
+              <Link to="/careers" className="btn btn-outline">
+                Join the Team
+                <ArrowRight className="h-4 w-4" aria-hidden="true" />
+              </Link>
+            }
           />
-          <div className="mt-14">
-            <TeamGrid />
-          </div>
-          <Reveal delay={120} className="mt-12 text-center">
-            <Link to="/team" className="btn btn-outline">
-              Meet the Team
-              <ArrowRight className="arrow" aria-hidden="true" />
-            </Link>
+          <Reveal className="mt-12">
+            <TeamGrid members={TEAM} />
           </Reveal>
         </div>
       </section>
 
-      <CtaSection />
+      <CtaSection
+        eyebrow="WORK WITH US"
+        title="Have a Project in Mind?"
+        text={`Call us at ${BRAND.phone} or request a proposal online — our pre-construction team responds within one business day.`}
+        ctaLabel="Get a Quote"
+        ctaTo="/contact"
+        image="https://images.unsplash.com/photo-1486325212027-8081e485255e?auto=format&fit=crop&w=1800&q=80"
+      />
     </>
   );
 }

@@ -1,61 +1,47 @@
-import { Check } from "lucide-react";
-import Reveal from "../ui/Reveal";
 import SectionHeading from "../ui/SectionHeading";
-import { STATS, WHY_POINTS } from "../../data/site";
+import Reveal from "../ui/Reveal";
+import ServiceIcon from "../ui/ServiceIcon";
+import { WHY_CHOOSE } from "../../data/site";
 
+const WHY_IMG =
+  "https://images.unsplash.com/photo-1581094794329-c8112a89af12?auto=format&fit=crop&w=1200&q=80";
+
+/** "Why choose us" — sticky editorial heading beside a benefits grid. */
 export default function WhyChoose() {
   return (
-    <section className="relative overflow-hidden bg-navy-darker py-20 text-white lg:py-28">
-      <img
-        src="https://images.unsplash.com/photo-1600596542815-ffad4c1539a9?auto=format&fit=crop&w=1600&q=70"
-        alt=""
-        aria-hidden="true"
-        loading="lazy"
-        className="absolute inset-y-0 right-0 hidden h-full w-1/2 object-cover opacity-15 lg:block"
-        style={{ maskImage: "linear-gradient(to left, black, transparent)", WebkitMaskImage: "linear-gradient(to left, black, transparent)" }}
-      />
-      <div aria-hidden="true" className="absolute inset-0 bg-gradient-to-r from-navy-darker via-navy-darker/85 to-navy-darker/60 lg:to-navy-darker/30" />
-
-      <div className="shell relative grid gap-14 lg:grid-cols-2 lg:items-center lg:gap-20">
-        <div>
+    <section className="py-20 lg:py-24">
+      <div className="shell grid gap-12 lg:grid-cols-[1fr_1.5fr] lg:gap-16">
+        <div className="lg:sticky lg:top-32 lg:self-start">
           <SectionHeading
-            align="left"
-            dark
-            eyebrow="The Horizon Difference"
-            title="Why Clients Choose Horizon"
-            description="We treat every transaction as a relationship, not a deal. That discipline has made us the quiet standard for premium real estate."
+            eyebrow="Why Choose Us"
+            title="Built on Experience. Driven by Excellence."
+            description="For over three decades, owners have trusted us with the projects that matter most — because we treat every build as a reputation, not a job."
           />
-          <ul className="mt-9 space-y-5">
-            {WHY_POINTS.map((point, i) => (
-              <Reveal key={point.title} delay={i * 90}>
-                <li className="flex items-start gap-4">
-                  <span className="mt-0.5 grid h-7 w-7 shrink-0 place-items-center rounded-full border border-gold/50 bg-gold/10 text-gold">
-                    <Check className="h-3.5 w-3.5" aria-hidden="true" />
-                  </span>
-                  <span>
-                    <span className="block font-bold text-white">{point.title}</span>
-                    <span className="mt-1 block text-sm leading-relaxed text-white/65">
-                      {point.description}
-                    </span>
-                  </span>
-                </li>
-              </Reveal>
-            ))}
-          </ul>
+          <Reveal delay={150} className="mt-8 overflow-hidden rounded-xl">
+            <img
+              src={WHY_IMG}
+              alt="Engineer in a hard hat reviewing plans on an active construction site"
+              loading="lazy"
+              className="zoom-img aspect-[16/11] w-full object-cover"
+            />
+          </Reveal>
         </div>
 
-        <Reveal delay={150}>
-          <div className="grid grid-cols-2 gap-px overflow-hidden rounded-2xl border border-white/10 bg-white/10">
-            {STATS.map((stat) => (
-              <div key={stat.label} className="bg-navy-darker p-8 lg:p-10">
-                <p className="text-3xl font-extrabold tracking-tight text-gold lg:text-4xl">
-                  {stat.value}
-                </p>
-                <p className="mt-2.5 text-sm font-semibold text-white/65">{stat.label}</p>
+        <div className="grid gap-x-10 sm:grid-cols-2">
+          {WHY_CHOOSE.map((item, i) => (
+            <Reveal key={item.title} delay={(i % 2) * 80} className="border-b border-line">
+              <div className="flex gap-4 py-6">
+                <span className="grid h-11 w-11 shrink-0 place-items-center rounded-lg bg-gold-pale text-gold-dark transition-colors duration-300">
+                  <ServiceIcon name={item.icon} className="h-5 w-5" strokeWidth={1.8} />
+                </span>
+                <span>
+                  <span className="block text-[15.5px] font-extrabold text-ink">{item.title}</span>
+                  <span className="mt-1.5 block text-[13.5px] leading-relaxed text-muted">{item.text}</span>
+                </span>
               </div>
-            ))}
-          </div>
-        </Reveal>
+            </Reveal>
+          ))}
+        </div>
       </div>
     </section>
   );

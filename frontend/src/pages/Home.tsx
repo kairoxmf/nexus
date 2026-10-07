@@ -1,42 +1,46 @@
-import { Link } from "react-router-dom";
-import { ArrowRight } from "lucide-react";
 import Hero from "../components/home/Hero";
-import About from "../components/home/About";
-import FeaturedProperties from "../components/home/FeaturedProperties";
-import Services from "../components/home/Services";
+import ServiceStrip from "../components/home/ServiceStrip";
+import FeaturedProjects from "../components/home/FeaturedProjects";
+import ServicesSection from "../components/home/ServicesSection";
 import WhyChoose from "../components/home/WhyChoose";
-import SectionHeading from "../components/ui/SectionHeading";
-import TeamGrid from "../components/team/TeamGrid";
-import CtaSection from "../components/home/CtaSection";
-import Reveal from "../components/ui/Reveal";
+import IndustriesSection from "../components/home/IndustriesSection";
+import TrustedBy from "../components/home/TrustedBy";
+import TeamSection from "../components/home/TeamSection";
+import BlogSection from "../components/home/BlogSection";
+import CtaSection from "../components/common/CtaSection";
+import { STATS } from "../data/site";
+
+const FINAL_CTA_IMG =
+  "https://images.unsplash.com/photo-1503174971373-b1f69850bded?auto=format&fit=crop&w=1800&q=80";
 
 export default function Home() {
   return (
     <>
       <Hero />
-      <About />
-      <FeaturedProperties />
-      <Services />
+      <ServiceStrip />
+      <FeaturedProjects />
+      <CtaSection
+        title="Let's Build Something Extraordinary Together."
+        text="From concept to completion, we are committed to turning your vision into reality."
+        ctaLabel="Start Your Project"
+        ctaTo="/contact"
+        image={FINAL_CTA_IMG}
+        stats={STATS}
+      />
+      <ServicesSection />
       <WhyChoose />
-      <section className="bg-white py-20 lg:py-28">
-        <div className="shell">
-          <SectionHeading
-            eyebrow="Our Team"
-            title="Meet the Experts"
-            description="Senior advisors who know these markets street by street — and answer their own phones."
-          />
-          <div className="mt-14">
-            <TeamGrid />
-          </div>
-          <Reveal delay={120} className="mt-12 text-center">
-            <Link to="/team" className="btn btn-outline">
-              Meet the Full Team
-              <ArrowRight className="arrow" aria-hidden="true" />
-            </Link>
-          </Reveal>
-        </div>
-      </section>
-      <CtaSection />
+      <IndustriesSection />
+      <TrustedBy />
+      <TeamSection />
+      <BlogSection />
+      <CtaSection
+        eyebrow="GET STARTED"
+        title="Start Your Project With Us."
+        text="Tell us about your goals and receive a detailed proposal from our pre-construction team within one business day."
+        ctaLabel="Request a Quote"
+        ctaTo="/contact"
+        image="https://images.unsplash.com/photo-1590725140246-20acdee442be?auto=format&fit=crop&w=1800&q=80"
+      />
     </>
   );
 }

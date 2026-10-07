@@ -1,145 +1,108 @@
-import { useState, type FormEvent } from "react";
-import { useSearchParams } from "react-router-dom";
-import { CheckCircle2, Mail, MapPin, Phone, Send } from "lucide-react";
+import { useLocation } from "react-router-dom";
+import { Clock, Facebook, Instagram, Linkedin, Mail, MapPin, Phone } from "lucide-react";
 import PageHero from "../components/ui/PageHero";
 import Reveal from "../components/ui/Reveal";
-import {
-  ADDRESS,
-  EMAIL,
-  PHONE,
-  PHONE_HREF,
-  PROPERTIES,
-} from "../data/site";
+import ContactForm from "../components/common/ContactForm";
+import { BRAND } from "../data/site";
+
+const INFO = [
+  { icon: Phone, label: "Phone", value: BRAND.phone, href: BRAND.phoneHref },
+  { icon: Mail, label: "Email", value: BRAND.email, href: `mailto:${BRAND.email}` },
+  {
+    icon: MapPin,
+    label: "Office",
+    value: `${BRAND.address1}, ${BRAND.address2}`,
+    href: "https://maps.google.com/?q=123+Construction+Way+New+York+NY+10001",
+  },
+  { icon: Clock, label: "Hours", value: "Mon – Fri · 8:00 AM – 6:00 PM", href: undefined },
+];
 
 export default function Contact() {
-  const [params] = useSearchParams();
-  const propertyRef = params.get("property");
-  const property = PROPERTIES.find((p) => p.slug === propertyRef);
-
-  const [form, setForm] = useState({
-    name: "",
-    email: "",
-    phone: "",
-    interest: property ? `Buying — ${property.name}` : "Buying",
-    message: property ? `I'd like to learn more about ${property.name}.` : "",
-  });
-  const [sent, setSent] = useState(false);
-  const [error, setError] = useState("");
-
-  const set = (key: keyof typeof form) => (value: string) =>
-    setForm((f) => ({ ...f, [key]: value }));
-
-  const submit = (e: FormEvent) => {
-    e.preventDefault();
-    if (!form.name.trim() || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(form.email) || !form.message.trim()) {
-      setError("Please fill in your name, a valid email and a message.");
-      return;
-    }
-    setError("");
-    setSent(true);
-  };
+  const location = useLocation();
+  const interest = (location.state as { interest?: string } | null)?.interest ?? "";
 
   return (
     <>
       <PageHero
-        eyebrow="Contact"
-        title="Let's Talk"
-        description="Tell us what you're looking for — a first home, a fifth investment, or something that doesn't exist on the market yet."
+        eyebrow="Contact Us"
+        title="Start Your Project With Us."
+        description="Tell us about your project — scope, site and timeline — and our pre-construction team will get back to you within one business day."
       />
 
-      <section className="bg-ivory py-20 lg:py-28">
-        <div className="shell grid items-start gap-10 lg:grid-cols-[400px_1fr] lg:gap-16">
-          <Reveal className="space-y-4">
-            <ContactCard
-              icon={<Phone className="h-5 w-5" aria-hidden="true" />}
-              label="Phone"
-              value={PHONE}
-              href={PHONE_HREF}
-            />
-            <ContactCard
-              icon={<Mail className="h-5 w-5" aria-hidden="true" />}
-              label="Email"
-              value={EMAIL}
-              href={`mailto:${EMAIL}`}
-            />
-            <div className="rounded-2xl border border-line bg-white p-6">
-              <span className="grid h-11 w-11 place-items-center rounded-xl bg-gold/10 text-gold">
-                <MapPin className="h-5 w-5" aria-hidden="true" />
-              </span>
-              <p className="mt-4 text-[11px] font-bold uppercase tracking-wider text-muted">Office</p>
-              <p className="mt-1.5 font-extrabold text-ink">{ADDRESS}</p>
-              <p className="mt-2 text-sm text-muted">Mon–Fri 9:00–18:00 · Sat by appointment</p>
-            </div>
+      <section className="py-14 lg:py-20">
+        <div className="shell grid gap-10 lg:grid-cols-[1.6fr_1fr] lg:gap-12">
+          <Reveal>
+            <ContactForm defaultDetails={interest} />
           </Reveal>
 
           <Reveal delay={120}>
-            <div className="rounded-2xl border border-line bg-white p-6 shadow-lg shadow-navy/5 sm:p-9">
-              {sent ? (
-                <div className="flex flex-col items-center py-14 text-center">
-                  <CheckCircle2 className="h-14 w-14 text-gold" aria-hidden="true" />
-                  <h2 className="mt-6 text-2xl font-extrabold text-ink">Message received</h2>
-                  <p className="mt-3 max-w-sm text-muted">
-                    Thank you, {form.name.split(" ")[0]}. One of our advisors will
-                    reach out within one business day.
-                  </p>
+            <div className="rounded-xl border border-line bg-navy-darker p-7 text-white sm:p-8">
+              <h2 className="text-lg font-extrabold">Contact Information</h2>
+              <ul className="mt-6 space-y-5">
+                {INFO.map(({ icon: Icon, label, value, href }) => (
+                  <li key={label} className="flex items-start gap-4">
+                    <span className="grid h-10 w-10 shrink-0 place-items-center rounded-lg bg-white/10 text-gold">
+                      <Icon className="h-5 w-5" aria-hidden="true" />
+                    </span>
+                    <span>
+                      <span className="block text-[11px] font-extrabold uppercase tracking-widest text-gold">
+                        {label}
+                      </span>
+                      {href ? (
+                        <a
+                          href={href}
+                          target={href.startsWith("http") ? "_blank" : undefined}
+                          rel="noreferrer"
+                          className="mt-1 block text-[14px] font-semibold text-white/85 transition-colors hover:text-gold"
+                        >
+                          {value}
+                        </a>
+                      ) : (
+                        <span className="mt-1 block text-[14px] font-semibold text-white/85">{value}</span>
+                      )}
+                    </span>
+                  </li>
+                ))}
+              </ul>
+              <div className="mt-8 border-t border-white/10 pt-6">
+                <p className="text-[11px] font-extrabold uppercase tracking-widest text-gold">Follow Us</p>
+                <div className="mt-3 flex items-center gap-3">
+                  {[
+                    { label: "Facebook", icon: Facebook, href: "https://facebook.com" },
+                    { label: "LinkedIn", icon: Linkedin, href: "https://linkedin.com" },
+                    { label: "Instagram", icon: Instagram, href: "https://instagram.com" },
+                  ].map(({ label, icon: Icon, href }) => (
+                    <a
+                      key={label}
+                      href={href}
+                      target="_blank"
+                      rel="noreferrer"
+                      aria-label={`Built Right on ${label}`}
+                      className="grid h-9 w-9 place-items-center rounded-md border border-white/15 text-white/70 transition-all duration-300 hover:border-gold hover:bg-gold hover:text-navy-abyss"
+                    >
+                      <Icon className="h-4 w-4" aria-hidden="true" />
+                    </a>
+                  ))}
                 </div>
-              ) : (
-                <form onSubmit={submit} noValidate>
-                  <h2 className="text-2xl font-extrabold text-ink">Send a Message</h2>
-                  <div className="mt-7 grid gap-5 sm:grid-cols-2">
-                    <div>
-                      <label htmlFor="c-name" className="field-label">Full name *</label>
-                      <input id="c-name" className="field" placeholder="Your name" value={form.name} onChange={(e) => set("name")(e.target.value)} />
-                    </div>
-                    <div>
-                      <label htmlFor="c-email" className="field-label">Email *</label>
-                      <input id="c-email" type="email" className="field" placeholder="you@example.com" value={form.email} onChange={(e) => set("email")(e.target.value)} />
-                    </div>
-                    <div>
-                      <label htmlFor="c-phone" className="field-label">Phone</label>
-                      <input id="c-phone" type="tel" className="field" placeholder="(555) 000-0000" value={form.phone} onChange={(e) => set("phone")(e.target.value)} />
-                    </div>
-                    <div>
-                      <label htmlFor="c-interest" className="field-label">I'm interested in</label>
-                      <select id="c-interest" className="field" value={form.interest} onChange={(e) => set("interest")(e.target.value)}>
-                        <option>Buying</option>
-                        <option>Selling</option>
-                        <option>Investment</option>
-                        <option>Valuation</option>
-                        <option>Relocation</option>
-                        <option>Something else</option>
-                      </select>
-                    </div>
-                    <div className="sm:col-span-2">
-                      <label htmlFor="c-message" className="field-label">Message *</label>
-                      <textarea id="c-message" rows={5} className="field resize-none" placeholder="Tell us what you're looking for…" value={form.message} onChange={(e) => set("message")(e.target.value)} />
-                    </div>
-                  </div>
-                  {error && <p className="mt-4 text-sm font-semibold text-red-600">{error}</p>}
-                  <button type="submit" className="btn btn-primary mt-7 w-full sm:w-auto">
-                    Send Message
-                    <Send className="arrow h-4 w-4" aria-hidden="true" />
-                  </button>
-                </form>
-              )}
+              </div>
             </div>
           </Reveal>
         </div>
+
+        {/* Map */}
+        <Reveal className="shell mt-12">
+          <div className="overflow-hidden rounded-xl border border-line shadow-card">
+            <iframe
+              title="Built Right Construction office location map"
+              src="https://www.google.com/maps?q=123%20Construction%20Way,%20New%20York,%20NY%2010001&output=embed"
+              className="h-[380px] w-full border-0"
+              loading="lazy"
+              referrerPolicy="no-referrer-when-downgrade"
+              allowFullScreen
+            />
+          </div>
+        </Reveal>
       </section>
     </>
-  );
-}
-
-function ContactCard({ icon, label, value, href }: { icon: React.ReactNode; label: string; value: string; href: string }) {
-  return (
-    <a href={href} className="group flex items-center gap-5 rounded-2xl border border-line bg-white p-6 transition-all duration-300 hover:-translate-y-0.5 hover:shadow-lg hover:shadow-navy/10">
-      <span className="grid h-11 w-11 shrink-0 place-items-center rounded-xl bg-gold/10 text-gold transition-colors duration-300 group-hover:bg-gold group-hover:text-navy-abyss">
-        {icon}
-      </span>
-      <span>
-        <span className="block text-[11px] font-bold uppercase tracking-wider text-muted">{label}</span>
-        <span className="mt-1 block font-extrabold text-ink">{value}</span>
-      </span>
-    </a>
   );
 }
