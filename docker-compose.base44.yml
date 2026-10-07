@@ -14,7 +14,7 @@ services:
       - ./:/app:rw
     command: ["sh", "-ec", "cd /app/frontend && npm install --legacy-peer-deps && exec npx vite --host 0.0.0.0 --port 5173 --strictPort"]
     healthcheck:
-      test: ["CMD", "wget", "-qO-", "http://localhost:5173/"]
+      test: ["CMD", "wget", "-qO-", "http://127.0.0.1:5173/"]
       interval: 10s
       timeout: 5s
       retries: 5
