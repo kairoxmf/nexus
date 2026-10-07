@@ -1,27 +1,20 @@
 import { createRoot } from "react-dom/client";
-import { I18nProvider } from "./i18n";
-import { NexusProvider } from "./context/NexusContext";
-import { AuthProvider } from "./context/AuthContext";
+import { BrowserRouter } from "react-router-dom";
 import App from "./App";
 import { ErrorBoundary } from "./components/ErrorBoundary";
-import "./styles/nexus-ui.css";
-import "./styles/page-creative.css";
-import "./nexus.css";
-import "@shared/icons/icon.css";
+import "./styles/horizon.css";
+import "./styles/horizon-components.css";
 
 const rootEl = document.getElementById("root");
 if (!rootEl) {
-  document.body.innerHTML = "<p style='color:#ff4655;padding:24px;font-family:monospace'>NEXUS: #root not found</p>";
+  document.body.innerHTML =
+    "<p style='color:#0A192F;padding:24px;font-family:system-ui'>Horizon Properties: #root not found</p>";
 } else {
   createRoot(rootEl).render(
     <ErrorBoundary>
-      <I18nProvider>
-        <AuthProvider>
-          <NexusProvider>
-            <App />
-          </NexusProvider>
-        </AuthProvider>
-      </I18nProvider>
+      <BrowserRouter>
+        <App />
+      </BrowserRouter>
     </ErrorBoundary>
   );
 }
