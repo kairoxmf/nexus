@@ -1,0 +1,21 @@
+# Base44 development environment — Horizon Properties
+# Frontend-only Vite/React app; serves live source on host port 3000.
+services:
+  web:
+    image: node:22
+    working_dir: /app
+    volumes:
+      - ./frontend:/app
+    # Install deps from package.json on boot, then run the Vite dev server.
+    command: ["sh", "-ec", "npm install --no-audit --no-fund --loglevel=error && exec npm run dev"]
+    ports:
+      - "3000:5173"
+    environment:
+      - NODE_ENV=development
+    restart: on-failure
+    healthcheck:
+      test: ["CMD", "node", "-e", "fetch('http://127.0.0.1:5173/').then(r=>process.exit(r.ok?0:1)).catch(()=>process.exit(1))"]
+      interval: 15s
+      timeout: 5s
+      retries: 10
+      start_period: 90s

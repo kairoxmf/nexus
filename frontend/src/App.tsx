@@ -1,47 +1,39 @@
-import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
-import { Shell } from "./ui/Shell";
-import { LandingPage } from "./pages/LandingPage";
-import { CommandPage } from "./pages/CommandPage";
-import { IntelPage } from "./pages/IntelPage";
-import { AuthPage } from "./pages/AuthPage";
-import { ProfilePage } from "./pages/ProfilePage";
-import { ContactPage } from "./pages/ContactPage";
-import { AdminPage } from "./pages/AdminPage";
-import { AuthGuard } from "./ui/AuthGuard";
+import { useEffect } from "react";
+import { Routes, Route } from "react-router-dom";
+import Header from "./components/layout/Header";
+import Footer from "./components/layout/Footer";
+import Home from "./pages/Home";
+import Properties from "./pages/Properties";
+import PropertyDetail from "./pages/PropertyDetail";
+import About from "./pages/About";
+import Services from "./pages/Services";
+import Team from "./pages/Team";
+import Contact from "./pages/Contact";
+import NotFound from "./pages/NotFound";
 
 export default function App() {
+  useEffect(() => {
+    window.addEventListener("error", (e) => {
+      console.error("Unhandled error:", e.message);
+    });
+  }, []);
+
   return (
-    <BrowserRouter>
-      <Routes>
-        <Route element={<Shell />}>
-          <Route path="/" element={<LandingPage />} />
-          <Route path="/command" element={<CommandPage />} />
-          <Route path="/intel" element={<IntelPage />} />
-          <Route path="/auth" element={<AuthPage />} />
-          <Route path="/profile" element={<ProfilePage />} />
-          <Route path="/contact" element={<ContactPage />} />
-          <Route
-            path="/admin"
-            element={
-              <AuthGuard role="admin">
-                <AdminPage />
-              </AuthGuard>
-            }
-          />
-
-          {/* Legacy Serene URLs → new routes */}
-          <Route path="/platform" element={<Navigate to="/command" replace />} />
-          <Route path="/login" element={<Navigate to="/auth" replace />} />
-          <Route path="/register" element={<Navigate to="/auth" replace />} />
-          <Route path="/dashboard" element={<Navigate to="/profile" replace />} />
-          <Route path="/vip" element={<Navigate to="/profile" replace />} />
-          <Route path="/about" element={<Navigate to="/" replace />} />
-          <Route path="/services" element={<Navigate to="/intel" replace />} />
-          <Route path="/journal" element={<Navigate to="/" replace />} />
-
-          <Route path="*" element={<Navigate to="/" replace />} />
-        </Route>
-      </Routes>
-    </BrowserRouter>
+    <div className="flex min-h-screen flex-col">
+      <Header />
+      <main className="flex-1">
+        <Routes>
+          <Route path="/" element={<Home />} />
+          <Route path="/properties" element={<Properties />} />
+          <Route path="/properties/:slug" element={<PropertyDetail />} />
+          <Route path="/about" element={<About />} />
+          <Route path="/services" element={<Services />} />
+          <Route path="/team" element={<Team />} />
+          <Route path="/contact" element={<Contact />} />
+          <Route path="*" element={<NotFound />} />
+        </Routes>
+      </main>
+      <Footer />
+    </div>
   );
 }

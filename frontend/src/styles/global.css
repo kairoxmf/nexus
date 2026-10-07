@@ -1,0 +1,191 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --shell: 80rem;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  @apply bg-white font-sans text-ink antialiased;
+  text-rendering: optimizeLegibility;
+}
+
+::selection {
+  background: #c8a15c;
+  color: #fff;
+}
+
+img {
+  -webkit-user-drag: none;
+  user-select: none;
+}
+
+/* ---------- layout ---------- */
+.shell {
+  width: 100%;
+  max-width: var(--shell);
+  margin-inline: auto;
+  padding-inline: 1.25rem;
+}
+@media (min-width: 768px) {
+  .shell {
+    padding-inline: 2.5rem;
+  }
+}
+
+/* ---------- typography ---------- */
+.eyebrow {
+  @apply inline-block text-[11px] font-extrabold uppercase tracking-[0.3em] text-gold;
+}
+
+/* ---------- buttons ---------- */
+.btn {
+  @apply inline-flex items-center justify-center gap-2 rounded-lg px-6 py-3 text-sm font-bold transition-all duration-300 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gold focus-visible:ring-offset-2;
+}
+.btn-primary {
+  @apply bg-navy text-white shadow-sm hover:-translate-y-0.5 hover:bg-navy-deep hover:shadow-lg hover:shadow-navy/25;
+}
+.btn-gold {
+  @apply bg-gold text-navy-abyss shadow-sm hover:-translate-y-0.5 hover:bg-gold-soft hover:shadow-lg hover:shadow-gold/30;
+}
+.btn-outline {
+  @apply border border-ink/15 bg-white text-ink hover:border-ink hover:bg-ink hover:text-white;
+}
+.btn-outline-light {
+  @apply border border-white/40 text-white hover:border-white hover:bg-white hover:text-navy-abyss;
+}
+.btn .arrow {
+  @apply h-4 w-4 transition-transform duration-300;
+}
+.btn:hover .arrow {
+  transform: translateX(3px);
+}
+
+/* ---------- scroll reveal ---------- */
+.reveal {
+  opacity: 0;
+  transform: translateY(28px);
+  transition:
+    opacity 0.8s ease,
+    transform 0.8s cubic-bezier(0.22, 0.61, 0.36, 1);
+  will-change: opacity, transform;
+}
+.reveal.is-visible {
+  opacity: 1;
+  transform: none;
+}
+
+/* ---------- hero entrance ---------- */
+@keyframes rise {
+  from {
+    opacity: 0;
+    transform: translateY(30px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+@keyframes heroZoom {
+  from {
+    transform: scale(1.04);
+  }
+  to {
+    transform: scale(1);
+  }
+}
+.hero-rise {
+  opacity: 0;
+  animation: rise 0.9s cubic-bezier(0.22, 0.61, 0.36, 1) forwards;
+}
+.hero-img {
+  transform: scale(1.04);
+  animation: heroZoom 2.4s ease-out forwards;
+}
+
+/* ---------- image hover zoom ---------- */
+.zoom-img {
+  transition: transform 0.8s cubic-bezier(0.22, 0.61, 0.36, 1);
+}
+.group:hover .zoom-img {
+  transform: scale(1.05);
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+.fade-in {
+  animation: fadeIn 0.4s ease both;
+}
+
+/* ---------- forms ---------- */
+.field {
+  @apply w-full rounded-lg border border-line bg-white px-4 py-3 text-sm text-ink outline-none transition placeholder:text-muted/60 focus:border-navy focus:ring-2 focus:ring-navy/10;
+}
+.field-label {
+  @apply mb-1.5 block text-[11px] font-bold uppercase tracking-wider text-muted;
+}
+
+/* ---------- carousel ---------- */
+.snap-track {
+  scroll-snap-type: x proximity;
+  scroll-behavior: smooth;
+  scroll-padding-inline-start: max(
+    1.25rem,
+    calc((100vw - var(--shell)) / 2 + 2.5rem)
+  );
+}
+.snap-track > * {
+  scroll-snap-align: start;
+}
+.no-scrollbar {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+.is-dragging {
+  scroll-behavior: auto;
+  scroll-snap-type: none;
+  cursor: grabbing;
+}
+.grabbing-cursor {
+  cursor: grab;
+}
+
+/* ---------- misc ---------- */
+.divider-fade {
+  background: linear-gradient(to right, transparent, #c8a15c, transparent);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+  .reveal,
+  .hero-rise,
+  .hero-img,
+  .zoom-img,
+  .fade-in {
+    animation: none !important;
+    transition: none !important;
+    opacity: 1 !important;
+    transform: none !important;
+  }
+}
+
+:focus-visible {
+  outline: 2px solid #c8a15c;
+  outline-offset: 2px;
+}
